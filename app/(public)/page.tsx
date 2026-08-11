@@ -14,7 +14,7 @@ const stats = [
 const booths = [
   {
     name: 'Snap Booth',
-    blurb: 'Sleek, compact and fully self-serve. Digital drop-off from $500 + HST.',
+    blurb: 'Sleek, compact and fully self-serve. Digital drop-off from $600 + HST.',
     img: '/booths/snap-booth.webp',
     panelBg: '#ede3db',
   },

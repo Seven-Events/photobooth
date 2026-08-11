@@ -8,7 +8,7 @@ import BoothImage from '@/components/site/BoothImage';
 export const metadata: Metadata = {
   title: 'Photobooth Packages & Pricing | Seven Events',
   description:
-    'Snap, Oak and Mod photobooth packages from $500. Drop-off, hourly and the Completely Captured wedding package, with free travel up to 100 km from Omemee.',
+    'Snap, Oak and Mod photobooth packages from $600. Drop-off, hourly and the Completely Captured wedding package, with free travel up to 100 km from Omemee.',
 };
 
 type Rate = { label: string; price: string; note: string; badge?: string };
@@ -33,7 +33,7 @@ type Booth = {
  */
 const sharedFeatures = [
   'Choice of premium backdrop',
-  'High-quality DSLR camera',
+  'Studio-quality DSLR photos',
   'Professional studio lighting',
   'Photos, videos and boomerangs',
   'Video guestbook',
@@ -58,7 +58,7 @@ const booths: Booth[] = [
     rates: [
       {
         label: 'Digital Drop-off',
-        price: '$500',
+        price: '$600',
         note: 'Up to 14 hours unlimited use — no attendant, no prints',
       },
     ],
