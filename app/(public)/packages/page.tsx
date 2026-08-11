@@ -6,62 +6,80 @@ import SiteFooter from '@/components/site/SiteFooter';
 export const metadata: Metadata = {
   title: 'Photobooth Packages & Pricing | Seven Events',
   description:
-    'Bronze, Silver and Gold photobooth packages from $299. Setup, attendant, instant prints and unlimited sessions included.',
+    'Snap, Oak and Mod photobooth packages from $500. Drop-off and attendant-staffed hourly options, with free travel up to 100 km from Omemee.',
 };
 
-const packages = [
+type Booth = {
+  name: string;
+  tagline: string;
+  features: string[];
+  pricing: {
+    label: string;
+    price: string;
+    note: string;
+  } | null;
+};
+
+const booths: Booth[] = [
   {
-    name: 'Bronze',
-    price: '$299',
-    duration: '2 hours',
-    summary: 'Perfect for smaller parties and short receptions.',
+    name: 'Snap Booth',
+    tagline: 'Sleek, compact and fully self-serve.',
     features: [
-      'Instant prints',
-      'Custom backdrop',
-      'Digital gallery link',
-      'Professional attendant',
-      '5 prop packages',
-      'Unlimited sessions',
+      'Choice of premium backdrop',
+      'Photos, videos and boomerangs',
+      'Video guestbook',
+      'Personalized image template',
+      'Live gallery',
+      'Instant sharing via text & email',
+      'Free travel up to 100 km from Omemee',
     ],
-    popular: false,
+    pricing: {
+      label: 'Digital Drop-off',
+      price: '$500',
+      note: 'Up to 14 hours unlimited use — no attendant, no prints',
+    },
   },
   {
-    name: 'Silver',
-    price: '$499',
-    duration: '4 hours',
-    summary: 'Our most booked package — built for weddings.',
+    name: 'Oak Booth',
+    tagline: 'Warm wood styling with studio-quality DSLR photos.',
     features: [
-      'Everything in Bronze',
-      'GIF & boomerang creation',
-      'Social media sharing',
-      'Premium props package',
-      'Custom photo templates',
-      'Email gallery delivery',
+      'Choice of premium backdrop',
+      'Studio quality DSLR photos',
+      'Photos, videos and boomerangs',
+      'Video guestbook',
+      'Personalized image template',
+      'Live gallery',
+      'Instant sharing via text & email',
+      'Free travel up to 100 km from Omemee',
     ],
-    popular: true,
+    pricing: {
+      label: 'Print Drop-off',
+      price: '$750',
+      note: 'Up to 14 hours unlimited use — no attendant, max 300 prints',
+    },
   },
   {
-    name: 'Gold',
-    price: '$799',
-    duration: '8 hours',
-    summary: 'Full-day coverage for corporate and large events.',
+    name: 'Mod Booth',
+    tagline: 'Our full-service booth with an onsite attendant.',
     features: [
-      'Everything in Silver',
-      'Extended full-day duration',
-      'Premium backdrop options',
-      'Video boomerang features',
-      'Custom branded prints',
-      'Priority scheduling',
+      'Choice of premium backdrop',
+      'Studio quality DSLR photos',
+      'Onsite attendant',
+      'Photos, videos and boomerangs',
+      'Video guestbook',
+      'Personalized image template',
+      'Live gallery',
+      'Instant sharing via text & email',
+      'Free travel up to 100 km from Omemee',
     ],
-    popular: false,
+    pricing: null,
   },
 ];
 
-const addons = [
-  { title: 'Extended hours', price: '+$100 / hour', desc: 'For longer events or extra coverage.' },
-  { title: 'Premium backdrop', price: '+$150', desc: 'Custom design tailored to your theme.' },
-  { title: 'Luxury props bundle', price: '+$75', desc: 'Exclusive props curated for your event.' },
-  { title: 'Premium print upgrade', price: '+$0.50 / print', desc: 'Heavier stock with a luxe finish.' },
+const hourly = [
+  { duration: '2 hours', digital: '$600', prints: '$800' },
+  { duration: '3 hours', digital: '$750', prints: '$950' },
+  { duration: '4 hours', digital: '$900', prints: '$1100' },
 ];
 
 export default function PackagesPage() {
@@ -93,173 +111,295 @@ export default function PackagesPage() {
               margin: '1.75rem 0 1.25rem',
             }}
           >
-            Photobooth packages
+            Booths &amp; packages
           </h1>
           <p style={{ fontSize: '1.15rem' }}>
-            Every package includes setup, breakdown, a friendly attendant, and unlimited sessions. No
-            surprise fees.
+            Three booths, drop-off or fully staffed. Every option includes a premium backdrop, a live
+            gallery and free travel up to 100&nbsp;km from Omemee.
           </p>
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* Booths */}
       <section style={{ padding: '0 2rem 5rem' }}>
-        <div
-          style={{
-            maxWidth: '1180px',
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '1.75rem',
-            alignItems: 'stretch',
-          }}
-        >
-          {packages.map((pkg) => (
-            <div
-              key={pkg.name}
-              style={{
-                backgroundColor: pkg.popular ? 'var(--ink)' : 'var(--paper)',
-                color: pkg.popular ? 'var(--cream)' : 'var(--ink)',
-                borderRadius: '1.75rem',
-                padding: '2.75rem 2.25rem',
-                border: pkg.popular ? '1px solid var(--ink)' : '1px solid var(--line)',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {pkg.popular && (
-                <span
-                  className="pill"
-                  style={{
-                    backgroundColor: 'var(--clay)',
-                    color: 'var(--ink)',
-                    position: 'absolute',
-                    top: '-14px',
-                    left: '2.25rem',
-                  }}
-                >
-                  Most popular
-                </span>
-              )}
-
-              <h3
+        <div style={{ maxWidth: '1180px', margin: '0 auto', display: 'grid', gap: '2.5rem' }}>
+          {booths.map((booth, i) => {
+            const reversed = i % 2 === 1;
+            return (
+              <article
+                key={booth.name}
                 style={{
-                  fontSize: '1.75rem',
-                  color: pkg.popular ? 'var(--cream)' : 'var(--ink)',
-                  marginBottom: '0.5rem',
+                  backgroundColor: 'var(--paper)',
+                  border: '1px solid var(--line)',
+                  borderRadius: '1.75rem',
+                  overflow: 'hidden',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
                 }}
               >
-                {pkg.name}
-              </h3>
-              <p
-                style={{
-                  fontSize: '0.95rem',
-                  color: pkg.popular ? 'rgba(250,247,239,0.75)' : 'rgba(37,70,65,0.7)',
-                  marginBottom: '1.75rem',
-                }}
-              >
-                {pkg.summary}
-              </p>
-
-              <div style={{ marginBottom: '2rem' }}>
-                <span
+                {/* Image panel */}
+                <div
                   style={{
-                    fontFamily: "'Archivo Black', sans-serif",
-                    fontSize: '3.25rem',
-                    color: 'var(--clay)',
-                    lineHeight: 1,
+                    backgroundColor: 'var(--blush)',
+                    minHeight: '340px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '3rem',
+                    order: reversed ? 2 : 1,
                   }}
                 >
-                  {pkg.price}
-                </span>
-                <p
-                  style={{
-                    marginTop: '0.5rem',
-                    fontSize: '0.8rem',
-                    letterSpacing: '0.14em',
-                    textTransform: 'uppercase',
-                    color: pkg.popular ? 'rgba(250,247,239,0.7)' : 'rgba(37,70,65,0.6)',
-                  }}
-                >
-                  {pkg.duration}
-                </p>
-              </div>
-
-              <ul style={{ listStyle: 'none', marginBottom: '2.25rem', flex: 1 }}>
-                {pkg.features.map((f) => (
-                  <li
-                    key={f}
+                  <div
                     style={{
-                      marginBottom: '0.9rem',
-                      paddingLeft: '1.75rem',
-                      position: 'relative',
-                      fontSize: '0.95rem',
-                      color: pkg.popular ? 'rgba(250,247,239,0.9)' : 'rgba(37,70,65,0.85)',
+                      width: '100%',
+                      maxWidth: '220px',
+                      aspectRatio: '3 / 4',
+                      borderRadius: '1rem',
+                      border: '2px dashed rgba(37,70,65,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      textAlign: 'center',
+                      padding: '1rem',
                     }}
                   >
-                    <span style={{ position: 'absolute', left: 0, color: 'var(--clay)', fontWeight: 700 }}>✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
+                    <span
+                      style={{
+                        fontSize: '0.75rem',
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(37,70,65,0.45)',
+                        fontWeight: 700,
+                      }}
+                    >
+                      {booth.name}
+                      <br />
+                      photo
+                    </span>
+                  </div>
+                </div>
 
-              <Link
-                href="/book"
-                style={{
-                  display: 'block',
-                  textAlign: 'center',
-                  padding: '1rem',
-                  borderRadius: '999px',
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  backgroundColor: pkg.popular ? 'var(--clay)' : 'var(--ink)',
-                  color: pkg.popular ? 'var(--ink)' : 'var(--cream)',
-                }}
-              >
-                Book {pkg.name} →
-              </Link>
-            </div>
-          ))}
+                {/* Detail panel */}
+                <div
+                  style={{
+                    padding: '3rem 2.75rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    order: reversed ? 1 : 2,
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: 'var(--sage)',
+                      color: 'var(--ink)',
+                      borderRadius: '0.75rem',
+                      padding: '1.25rem 1.75rem',
+                      marginBottom: '1.75rem',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <h2
+                      style={{
+                        fontSize: 'clamp(1.75rem, 3vw, 2.25rem)',
+                        margin: 0,
+                        color: 'var(--ink)',
+                      }}
+                    >
+                      {booth.name}
+                    </h2>
+                  </div>
+
+                  <p style={{ marginBottom: '1.5rem', fontSize: '1rem' }}>{booth.tagline}</p>
+
+                  <ul style={{ listStyle: 'none', margin: 0, padding: 0, flex: 1 }}>
+                    {booth.features.map((f) => (
+                      <li
+                        key={f}
+                        style={{
+                          marginBottom: '0.7rem',
+                          paddingLeft: '1.6rem',
+                          position: 'relative',
+                          fontSize: '0.95rem',
+                          color: 'rgba(37,70,65,0.85)',
+                        }}
+                      >
+                        <span style={{ position: 'absolute', left: 0, color: 'var(--clay)', fontWeight: 700 }}>
+                          •
+                        </span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {booth.pricing ? (
+                    <div style={{ marginTop: '2rem', paddingTop: '1.75rem', borderTop: '1px solid var(--line)' }}>
+                      <p style={{ margin: 0, fontSize: '1.15rem', color: 'var(--ink)', fontWeight: 600 }}>
+                        {booth.pricing.label} —{' '}
+                        <strong
+                          style={{
+                            fontFamily: "'Archivo Black', sans-serif",
+                            fontSize: '1.6rem',
+                            color: 'var(--clay)',
+                          }}
+                        >
+                          {booth.pricing.price}
+                        </strong>
+                      </p>
+                      <p
+                        style={{
+                          margin: '0.5rem 0 1.5rem',
+                          fontSize: '0.85rem',
+                          color: 'rgba(37,70,65,0.6)',
+                        }}
+                      >
+                        {booth.pricing.note}
+                      </p>
+                      <Link
+                        href="/book"
+                        style={{
+                          display: 'inline-block',
+                          padding: '0.9rem 2rem',
+                          borderRadius: '999px',
+                          fontWeight: 700,
+                          textDecoration: 'none',
+                          backgroundColor: 'var(--ink)',
+                          color: 'var(--cream)',
+                        }}
+                      >
+                        Book the {booth.name} →
+                      </Link>
+                    </div>
+                  ) : (
+                    <div style={{ marginTop: '2rem', paddingTop: '1.75rem', borderTop: '1px solid var(--line)' }}>
+                      <p style={{ margin: '0 0 1.5rem', fontSize: '0.95rem', color: 'rgba(37,70,65,0.7)' }}>
+                        Available with our attendant-staffed hourly packages below.
+                      </p>
+                      <a
+                        href="#hourly"
+                        style={{
+                          display: 'inline-block',
+                          padding: '0.9rem 2rem',
+                          borderRadius: '999px',
+                          fontWeight: 700,
+                          textDecoration: 'none',
+                          backgroundColor: 'var(--ink)',
+                          color: 'var(--cream)',
+                        }}
+                      >
+                        See hourly pricing ↓
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 
-      {/* Add-ons */}
-      <section style={{ padding: '5rem 2rem', backgroundColor: 'var(--paper)' }}>
-        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
-          <h2
-            style={{
-              color: 'var(--ink)',
-              textAlign: 'center',
-              marginBottom: '3.5rem',
-              fontSize: 'clamp(2rem, 5vw, 3.25rem)',
-            }}
-          >
-            Optional add-ons
-          </h2>
+      {/* Hourly packages */}
+      <section id="hourly" style={{ padding: '5rem 2rem', backgroundColor: 'var(--paper)' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <span className="pill" style={{ backgroundColor: 'var(--blush)', color: 'var(--ink)' }}>
+              Staffed by an attendant
+            </span>
+            <h2 style={{ color: 'var(--ink)', marginTop: '1.5rem', fontSize: 'clamp(2rem, 5vw, 3.25rem)' }}>
+              Hourly packages
+            </h2>
+            <p style={{ fontSize: '1.05rem' }}>
+              Our attendant handles setup, guests and breakdown so you never think about it.
+            </p>
+          </div>
 
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: '1.5rem',
+              backgroundColor: 'var(--cream)',
+              border: '1px solid var(--line)',
+              borderRadius: '1.5rem',
+              overflow: 'hidden',
             }}
           >
-            {addons.map((a) => (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1.4fr 1fr 1fr',
+                padding: '1.25rem 2rem',
+                backgroundColor: 'var(--ink)',
+                color: 'var(--cream)',
+                fontSize: '0.75rem',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                fontWeight: 700,
+              }}
+            >
+              <span>Duration</span>
+              <span style={{ textAlign: 'right' }}>Digital only</span>
+              <span style={{ textAlign: 'right' }}>With prints</span>
+            </div>
+
+            {hourly.map((row, i) => (
               <div
-                key={a.title}
+                key={row.duration}
                 style={{
-                  backgroundColor: 'var(--cream)',
-                  padding: '2.25rem',
-                  borderRadius: '1.5rem',
-                  border: '1px solid var(--line)',
+                  display: 'grid',
+                  gridTemplateColumns: '1.4fr 1fr 1fr',
+                  padding: '1.4rem 2rem',
+                  alignItems: 'center',
+                  borderTop: i === 0 ? 'none' : '1px solid var(--line)',
                 }}
               >
-                <h4 style={{ color: 'var(--ink)' }}>{a.title}</h4>
-                <p style={{ color: 'var(--clay)', fontWeight: 700, marginBottom: '0.75rem' }}>{a.price}</p>
-                <p style={{ fontSize: '0.95rem', margin: 0 }}>{a.desc}</p>
+                <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{row.duration}</span>
+                <span
+                  style={{
+                    textAlign: 'right',
+                    fontFamily: "'Archivo Black', sans-serif",
+                    fontSize: '1.35rem',
+                    color: 'var(--ink)',
+                  }}
+                >
+                  {row.digital}
+                </span>
+                <span
+                  style={{
+                    textAlign: 'right',
+                    fontFamily: "'Archivo Black', sans-serif",
+                    fontSize: '1.35rem',
+                    color: 'var(--clay)',
+                  }}
+                >
+                  {row.prints}
+                </span>
               </div>
             ))}
+          </div>
+
+          <p
+            style={{
+              marginTop: '1.5rem',
+              fontSize: '0.85rem',
+              color: 'rgba(37,70,65,0.6)',
+              textAlign: 'center',
+            }}
+          >
+            *All print packages include unlimited prints.
+          </p>
+
+          <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
+            <Link
+              href="/book"
+              style={{
+                display: 'inline-block',
+                padding: '1.15rem 2.5rem',
+                borderRadius: '999px',
+                fontWeight: 700,
+                textDecoration: 'none',
+                backgroundColor: 'var(--clay)',
+                color: 'var(--ink)',
+              }}
+            >
+              Check Your Date →
+            </Link>
           </div>
         </div>
       </section>
