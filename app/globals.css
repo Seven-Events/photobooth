@@ -1,16 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sohne:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --ink: #4A6B66;
-  --clay: #E8A89B;
-  --cream: #F5F1ED;
+  --ink: #254641;
+  --clay: #e58b82;
+  --sage: #c5d1b1;
+  --cream: #faf7ef;
   --paper: #FFFFFF;
-  --blush: #F0E8E0;
-  --line: #E4D9C9;
+  --blush: #f5efe8;
+  --line: #e0d5c7;
   --danger: #A8503C;
   --ok: #4A7A5E;
 }
@@ -33,24 +34,28 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Fraunces', serif;
-  font-weight: 600;
-  line-height: 1.2;
+  font-family: 'Sohne', 'Inter', sans-serif;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 h1 {
-  font-size: 3.5rem;
-  margin-bottom: 1.5rem;
+  font-size: 4.5rem;
+  margin-bottom: 2rem;
+  font-weight: 700;
 }
 
 h2 {
-  font-size: 2.5rem;
-  margin-bottom: 1.25rem;
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
 }
 
 h3 {
-  font-size: 1.875rem;
+  font-size: 2rem;
   margin-bottom: 1rem;
+  font-weight: 700;
 }
 
 p {
