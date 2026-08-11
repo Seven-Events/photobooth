@@ -14,19 +14,19 @@ const stats = [
 const booths = [
   {
     name: 'Snap Booth',
-    blurb: 'Sleek, compact and fully self-serve. Digital drop-off from $500.',
+    blurb: 'Sleek, compact and fully self-serve. Digital drop-off from $500 + HST.',
     img: '/booths/snap-booth.webp',
     panelBg: '#ede3db',
   },
   {
     name: 'Oak Booth',
-    blurb: 'Warm wood styling on a hardwood tripod. Print drop-off from $750.',
+    blurb: 'Warm wood styling on a hardwood tripod. Print drop-off from $750 + HST.',
     img: '/booths/oak-booth.webp',
     panelBg: '#ede3db',
   },
   {
     name: 'Mod Booth',
-    blurb: 'Full-service with an onsite attendant. Hourly, or $1,200 for a wedding.',
+    blurb: 'Full-service with an onsite attendant. Hourly, or $1,200 + HST for a wedding.',
     img: '/booths/mod-booth.webp',
     panelBg: '#ede3db',
   },

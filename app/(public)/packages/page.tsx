@@ -86,7 +86,7 @@ const booths: Booth[] = [
       {
         label: 'Completely Captured',
         price: '$1,200',
-        note: '+ tax · 1.5 hrs cocktail hour plus 3 hrs reception — split coverage so there is never a line',
+        note: '1.5 hrs cocktail hour plus 3 hrs reception — split coverage so there is never a line',
         badge: 'Best for weddings',
       },
     ],
@@ -127,7 +127,8 @@ export default function PackagesPage() {
           </h1>
           <p style={{ fontSize: '1.15rem' }}>
             Three booths, drop-off or fully staffed. Every option includes a premium backdrop, a live
-            gallery and free travel up to 100&nbsp;km from Omemee.
+            gallery and free travel up to 100&nbsp;km from Omemee. All prices are plus HST — nothing
+            else gets added at the end.
           </p>
         </div>
       </section>
@@ -245,7 +246,16 @@ export default function PackagesPage() {
                             }}
                           >
                             {rate.price}
-                          </strong>
+                          </strong>{' '}
+                          <span
+                            style={{
+                              fontSize: '0.85rem',
+                              fontWeight: 500,
+                              color: 'rgba(37,70,65,0.6)',
+                            }}
+                          >
+                            + HST
+                          </span>
                         </p>
                         <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'rgba(37,70,65,0.6)' }}>
                           {rate.note}
@@ -299,7 +309,7 @@ export default function PackagesPage() {
                         </div>
 
                         <p style={{ margin: '0.85rem 0 0', fontSize: '0.78rem', color: 'rgba(37,70,65,0.55)' }}>
-                          All print packages include unlimited prints.
+                          All hourly rates plus HST. Print packages include unlimited prints.
                         </p>
                       </div>
                     )}
