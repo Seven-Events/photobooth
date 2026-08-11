@@ -158,7 +158,7 @@ export default function PackagesPage() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    padding: '3rem',
+                    padding: '2.5rem',
                     order: reversed ? 2 : 1,
                   }}
                 >

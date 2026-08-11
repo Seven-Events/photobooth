@@ -67,9 +67,12 @@ export default function BoothImage({ src, alt, label }: Props) {
       alt={alt}
       onError={() => setFailed(true)}
       style={{
-        width: '100%',
-        maxWidth: '340px',
-        height: 'auto',
+        // Sized by height, not width: the shots are trimmed to the booth, so
+        // matching heights makes all three read at the same visual scale
+        // despite their different silhouettes.
+        height: 'clamp(300px, 46vw, 560px)',
+        width: 'auto',
+        maxWidth: '100%',
         objectFit: 'contain',
         display: 'block',
       }}

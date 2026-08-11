@@ -341,7 +341,7 @@ export default function Home() {
                     src={booth.img}
                     alt={`The ${booth.name}`}
                     loading="lazy"
-                    style={{ width: '100%', maxWidth: '200px', height: '220px', objectFit: 'contain' }}
+                    style={{ height: '260px', width: 'auto', maxWidth: '100%', objectFit: 'contain' }}
                   />
                 </div>
                 <div style={{ padding: '1.75rem 2rem 2rem' }}>
