@@ -114,6 +114,10 @@ const included = [
     title: 'Same-day date check',
     copy: 'Send us your date and we confirm availability the same day — no waiting on a quote.',
   },
+  {
+    title: 'Prints set aside for you',
+    copy: 'Our attendant keeps a selection of the night’s prints back for you, so the hosts are not the ones left without any.',
+  },
 ];
 
 const regions = [

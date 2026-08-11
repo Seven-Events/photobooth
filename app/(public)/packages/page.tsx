@@ -7,7 +7,7 @@ import BoothImage from '@/components/site/BoothImage';
 export const metadata: Metadata = {
   title: 'Photobooth Packages & Pricing | Seven Events',
   description:
-    'Snap, Oak and Mod photobooth packages from $500. Drop-off and attendant-staffed hourly options, with free travel up to 100 km from Omemee.',
+    'Snap, Oak and Mod photobooth packages from $500. Drop-off, hourly and the Completely Captured wedding package, with free travel up to 100 km from Omemee.',
 };
 
 type Booth = {
@@ -22,6 +22,8 @@ type Booth = {
     price: string;
     note: string;
   } | null;
+  /** Optional pointer to the hourly table for booths sold by the hour too. */
+  alsoHourly?: boolean;
 };
 
 const booths: Booth[] = [
@@ -82,7 +84,12 @@ const booths: Booth[] = [
       'Instant sharing via text & email',
       'Free travel up to 100 km from Omemee',
     ],
-    pricing: null,
+    pricing: {
+      label: 'Completely Captured',
+      price: '$1,200',
+      note: '+ tax · 1.5 hrs of cocktail hour plus 3 hrs of reception — split coverage so there is never a line',
+    },
+    alsoHourly: true,
   },
 ];
 
@@ -241,20 +248,27 @@ export default function PackagesPage() {
                       >
                         {booth.pricing.note}
                       </p>
-                      <Link
-                        href="/book"
-                        style={{
-                          display: 'inline-block',
-                          padding: '0.9rem 2rem',
-                          borderRadius: '999px',
-                          fontWeight: 700,
-                          textDecoration: 'none',
-                          backgroundColor: 'var(--ink)',
-                          color: 'var(--cream)',
-                        }}
-                      >
-                        Book the {booth.name} →
-                      </Link>
+                      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <Link
+                          href="/book"
+                          style={{
+                            display: 'inline-block',
+                            padding: '0.9rem 2rem',
+                            borderRadius: '999px',
+                            fontWeight: 700,
+                            textDecoration: 'none',
+                            backgroundColor: 'var(--ink)',
+                            color: 'var(--cream)',
+                          }}
+                        >
+                          Book the {booth.name} →
+                        </Link>
+                        {booth.alsoHourly && (
+                          <a href="#hourly" style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                            or book it by the hour ↓
+                          </a>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <div style={{ marginTop: '2rem', paddingTop: '1.75rem', borderTop: '1px solid var(--line)' }}>
@@ -371,6 +385,72 @@ export default function PackagesPage() {
           >
             *All print packages include unlimited prints.
           </p>
+
+          {/* Split-coverage option — the one most weddings actually want. */}
+          <div
+            style={{
+              marginTop: '2.5rem',
+              backgroundColor: 'var(--ink)',
+              color: 'var(--cream)',
+              borderRadius: '1.5rem',
+              padding: '2.5rem',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1.5rem',
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <span className="pill" style={{ backgroundColor: 'var(--clay)', color: 'var(--ink)' }}>
+                Best for weddings
+              </span>
+              <h3 style={{ color: 'var(--cream)', margin: '1.25rem 0 0.75rem', fontSize: '1.75rem' }}>
+                Completely Captured
+              </h3>
+              <p style={{ color: 'rgba(250,247,239,0.8)', margin: 0, fontSize: '0.95rem' }}>
+                1.5 hrs of cocktail hour plus 3 hrs of reception with the Mod Booth. Splitting the
+                coverage across the night is why our couples say there was never a line.
+              </p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <span
+                style={{
+                  fontFamily: "'Archivo Black', sans-serif",
+                  fontSize: '3rem',
+                  color: 'var(--clay)',
+                  lineHeight: 1,
+                  display: 'block',
+                }}
+              >
+                $1,200
+              </span>
+              <p
+                style={{
+                  color: 'rgba(250,247,239,0.7)',
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  margin: '0.5rem 0 1.5rem',
+                }}
+              >
+                + tax · 4.5 hrs total
+              </p>
+              <Link
+                href="/book"
+                style={{
+                  display: 'inline-block',
+                  padding: '0.9rem 2rem',
+                  borderRadius: '999px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  backgroundColor: 'var(--clay)',
+                  color: 'var(--ink)',
+                }}
+              >
+                Book Completely Captured →
+              </Link>
+            </div>
+          </div>
 
           <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
             <Link
