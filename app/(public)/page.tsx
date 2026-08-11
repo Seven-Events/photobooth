@@ -47,12 +47,46 @@ const steps = [
 ];
 
 /**
- * Real customer reviews only. Leave this empty rather than inventing quotes —
- * the section below hides itself when there is nothing verified to show.
- * Paste Google reviews here verbatim, with the reviewer's name as it appears
- * publicly.
+ * Real customer reviews only — never invent these. `quote` must be a verbatim
+ * excerpt of `full`, not a paraphrase, and `full` is reproduced exactly as the
+ * reviewer wrote it. The section below hides itself when this array is empty.
  */
-const testimonials: { name: string; event: string; text: string }[] = [];
+const testimonials: { name: string; event: string; quote: string; full?: string }[] = [
+  {
+    name: 'Shangni',
+    event: 'Wedding · November 2025',
+    quote:
+      'With the wonderful service, super customizable personal template that you can send them as your frame design, the flexible options in packages, and the price transparency on their website, this is a DREAM wedding vendor.',
+    full: `Booked them for my Wedding in Nov 2025.
+
+We did the Completely Captured package $1,200+tax
+- 1.5 hrs of cocktail hour Photo Booth
+- 3hrs of reception Photo Booth
+
+Highly recommend this package if you can swing it because there was never ever a line for the Photo Booth!
+
+The attendants came right on time, made everything was set up and ready to go. There were several different modes including boomerang, and the photo booth angle is slightly adjustable for taller guests or for better face light!
+
+They sent me a questionnaire with the option of a custom template. I sent back a JPG I made in canva with my 2 cats, and they made the exact template I sent be our frame for the printouts, WHICH WAS ADORABLE EVERYONE LOVED IT.
+
+While they have an attendant there the photo booth is very intuitive to use. I've used other mirror photo booths at weddings and those can sometimes be buggy and hard to use.
+
+There's a gallery link that guests and you can access that has every single photo in it, the individual ones, and then 1 in your template.
+
+The attendants for the booth also printed out every single photo our guests took and kept 1 copy aside for us so we can have at least 1 of each 🙏
+
+With the wonderful service, super customizable personal template that you can send them as your frame design, the flexible options in packages, and the price transparency on their website, this is a DREAM wedding vendor. 👌🏻👌🏻
+
+My fiancé didn't even want a photo booth, but he admits with joy that Seven Events was a wonderful breeze to have and work with. You won't regret booking with them ❤️`,
+  },
+  {
+    name: 'RJ',
+    event: 'Staff Party',
+    quote:
+      'As the evening progressed, taking advantage of the simple to use service left us with plenty of fun photos with a mix of staff. The memories created with this are wonderful!',
+    full: `My workplace took advantage of this service during our last staff party, and it was a wonderful addition. As the evening progressed, taking advantage of the simple to use service left us with plenty of fun photos with a mix of staff. The memories created with this are wonderful! I strongly recommend you consider this service at your next party. The owner of the business is a good person as well.`,
+  },
+];
 
 /** What actually removes hesitation at the point of booking. */
 const included = [
@@ -514,7 +548,34 @@ export default function Home() {
               >
                 <div style={{ color: '#e0a300', fontSize: '1.1rem', letterSpacing: '0.1em' }}>★★★★★</div>
                 <blockquote style={{ margin: 0, flex: 1 }}>
-                  <p style={{ fontSize: '1.05rem', color: 'var(--ink)', margin: 0 }}>&ldquo;{t.text}&rdquo;</p>
+                  <p style={{ fontSize: '1.05rem', color: 'var(--ink)', margin: 0 }}>&ldquo;{t.quote}&rdquo;</p>
+
+                  {/* Native disclosure — the full review stays one click away
+                      so the excerpt can never be accused of cherry-picking. */}
+                  {t.full && (
+                    <details style={{ marginTop: '1.25rem' }}>
+                      <summary
+                        style={{
+                          cursor: 'pointer',
+                          color: 'var(--clay)',
+                          fontWeight: 700,
+                          fontSize: '0.85rem',
+                        }}
+                      >
+                        Read the full review
+                      </summary>
+                      <p
+                        style={{
+                          marginTop: '1rem',
+                          fontSize: '0.9rem',
+                          whiteSpace: 'pre-line',
+                          color: 'rgba(37,70,65,0.75)',
+                        }}
+                      >
+                        {t.full}
+                      </p>
+                    </details>
+                  )}
                 </blockquote>
                 <figcaption>
                   <p style={{ margin: 0, fontWeight: 700, color: 'var(--ink)', fontSize: '0.95rem' }}>{t.name}</p>
