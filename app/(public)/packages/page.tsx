@@ -134,8 +134,7 @@ export default function PackagesPage() {
                   ))}
                 </ul>
 
-                <Link
-                  href="/book"
+                <div
                   style={{
                     display: 'block',
                     backgroundColor: pkg.popular ? 'var(--clay)' : 'transparent',
@@ -147,6 +146,7 @@ export default function PackagesPage() {
                     fontWeight: 600,
                     textDecoration: 'none',
                     transition: 'all 0.3s',
+                    cursor: 'pointer',
                   }}
                   onMouseEnter={(e) => {
                     if (!pkg.popular) {
@@ -160,9 +160,12 @@ export default function PackagesPage() {
                       e.currentTarget.style.color = 'var(--clay)';
                     }
                   }}
+                  onClick={() => window.location.href = '/book'}
                 >
-                  Book This Package
-                </Link>
+                  <Link href="/book" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    Book This Package
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
