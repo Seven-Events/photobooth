@@ -114,6 +114,55 @@ p {
   line-height: 1.7;
 }
 
+/* Site nav. Below 860px the links wrap onto their own centred row so they
+   stay reachable instead of being hidden behind a menu that does not exist. */
+.site-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.site-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+@media (max-width: 860px) {
+  .site-nav-bar {
+    justify-content: center;
+    gap: 1.25rem;
+  }
+
+  .site-nav-links {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Masonry gallery — columns keep every shot at its native aspect ratio. */
+.masonry {
+  column-count: 3;
+  column-gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .masonry {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 560px) {
+  .masonry {
+    column-count: 1;
+  }
+}
+
 a {
   color: var(--clay);
   text-decoration: none;

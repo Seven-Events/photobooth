@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Original full-resolution photos. Optimised web copies live in /public;
+# these stay local (the folder is inside OneDrive, so it is already backed up).
+source-photos/

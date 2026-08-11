@@ -68,7 +68,7 @@ export default function BoothImage({ src, alt, label }: Props) {
       onError={() => setFailed(true)}
       style={{
         width: '100%',
-        maxWidth: '260px',
+        maxWidth: '340px',
         height: 'auto',
         objectFit: 'contain',
         display: 'block',

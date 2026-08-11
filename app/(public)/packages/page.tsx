@@ -13,6 +13,8 @@ export const metadata: Metadata = {
 type Booth = {
   name: string;
   slug: string;
+  /** Matches the flat backdrop baked into the product shot so it blends in. */
+  panelBg: string;
   tagline: string;
   features: string[];
   pricing: {
@@ -26,6 +28,7 @@ const booths: Booth[] = [
   {
     name: 'Snap Booth',
     slug: 'snap-booth',
+    panelBg: '#ede3db',
     tagline: 'Sleek, compact and fully self-serve.',
     features: [
       'Choice of premium backdrop',
@@ -45,6 +48,7 @@ const booths: Booth[] = [
   {
     name: 'Oak Booth',
     slug: 'oak-booth',
+    panelBg: '#ede3db',
     tagline: 'Warm wood styling with studio-quality DSLR photos.',
     features: [
       'Choice of premium backdrop',
@@ -65,6 +69,7 @@ const booths: Booth[] = [
   {
     name: 'Mod Booth',
     slug: 'mod-booth',
+    panelBg: '#e1dfde',
     tagline: 'Our full-service booth with an onsite attendant.',
     features: [
       'Choice of premium backdrop',
@@ -145,7 +150,7 @@ export default function PackagesPage() {
                 {/* Image panel */}
                 <div
                   style={{
-                    backgroundColor: 'var(--blush)',
+                    backgroundColor: booth.panelBg,
                     minHeight: '340px',
                     display: 'flex',
                     alignItems: 'center',
@@ -155,7 +160,7 @@ export default function PackagesPage() {
                   }}
                 >
                   <BoothImage
-                    src={`/booths/${booth.slug}.png`}
+                    src={`/booths/${booth.slug}.webp`}
                     alt={`${booth.name} photobooth`}
                     label={booth.name}
                   />

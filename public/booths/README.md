@@ -1,22 +1,21 @@
 # Booth product photos
 
-Drop the three booth product shots in this folder. The packages page picks them
-up automatically — no code change needed.
+Served on `/packages` and in the "Three booths" grid on the home page.
 
-## Required filenames
-
-| File | Shown on |
+| File | Booth |
 | --- | --- |
-| `snap-booth.png` | Snap Booth card |
-| `oak-booth.png` | Oak Booth card |
-| `mod-booth.png` | Mod Booth card |
+| `snap-booth.webp` | Snap Booth |
+| `oak-booth.webp` | Oak Booth |
+| `mod-booth.webp` | Mod Booth |
 
-## Specs
+Each shot has a flat studio backdrop baked in, so the panel behind it is tinted
+to match. Those colours live in `panelBg` in `app/(public)/packages/page.tsx`
+and in the `booths` array on the home page. **If you replace a shot with one
+that has a different backdrop, update `panelBg` to match** or you will see a
+visible rectangle behind the booth.
 
-- **Format:** PNG with a transparent background (they sit on a warm beige panel).
-  JPG works but will show a white box behind the booth.
-- **Orientation:** Portrait, roughly 3:4. The booth should fill most of the frame.
-- **Size:** ~800×1000px is plenty. Keep each file under ~400 KB.
+To swap one out: export at roughly 1000px on the long edge, save as `.webp`,
+and keep the filename. A missing file falls back to a dashed placeholder frame
+rather than a broken image, so a partial upload is safe.
 
-If a file is missing, that card falls back to a dashed placeholder frame rather
-than a broken image, so a partial upload is safe.
+Originals are kept in `source-photos/` at the repo root.

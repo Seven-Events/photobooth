@@ -25,14 +25,11 @@ export default function SiteNav() {
       }}
     >
       <div
+        className="site-nav-bar"
         style={{
           maxWidth: '1280px',
           margin: '0 auto',
           padding: '1.75rem 2rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '2rem',
         }}
       >
         <Link
@@ -70,7 +67,7 @@ export default function SiteNav() {
           </span>
         </Link>
 
-        <nav style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }} className="hidden md:flex">
+        <nav className="site-nav-links">
           {links.map((link) => (
             <Link
               key={link.href}

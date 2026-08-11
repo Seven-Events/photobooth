@@ -9,27 +9,33 @@ const stats = [
   { value: '4.9★', label: 'Average rating' },
 ];
 
-const experiences = [
+const booths = [
   {
-    name: 'The Portrait Booth',
-    blurb: 'Magazine-quality portraits of your people, printed in seconds.',
-    tone: 'var(--clay)',
+    name: 'Snap Booth',
+    blurb: 'Sleek, compact and fully self-serve. Digital drop-off from $500.',
+    img: '/booths/snap-booth.webp',
+    panelBg: '#ede3db',
   },
   {
-    name: 'Open-Air Booth',
-    blurb: 'Big group energy with a custom backdrop built for your theme.',
-    tone: 'var(--sage)',
+    name: 'Oak Booth',
+    blurb: 'Warm wood styling with studio-quality DSLR photos and prints.',
+    img: '/booths/oak-booth.webp',
+    panelBg: '#ede3db',
   },
   {
-    name: 'Roaming Photography',
-    blurb: 'We work the room and deliver instant prints wherever guests are.',
-    tone: 'var(--clay)',
+    name: 'Mod Booth',
+    blurb: 'Our full-service booth, staffed by an onsite attendant.',
+    img: '/booths/mod-booth.webp',
+    panelBg: '#e1dfde',
   },
-  {
-    name: 'GIF & Boomerang',
-    blurb: 'Short, shareable clips that land on guest phones instantly.',
-    tone: 'var(--sage)',
-  },
+];
+
+/** A few gallery shots surfaced on the home page as a teaser strip. */
+const featured = [
+  { src: '/gallery/guest-at-booth.webp', alt: 'A guest laughing at the Seven Events booth' },
+  { src: '/gallery/floral-wall-guests.webp', alt: 'Two guests in front of a floral wall backdrop' },
+  { src: '/gallery/string-lights-guests.webp', alt: 'Guests against a wood and festoon-light backdrop' },
+  { src: '/gallery/gala-guests-group.webp', alt: 'A family posing together at a charity gala' },
 ];
 
 const steps = [
@@ -154,6 +160,27 @@ export default function Home() {
               See Packages
             </Link>
           </div>
+
+          {/* Hero shot */}
+          <div
+            style={{
+              marginTop: '4rem',
+              borderRadius: '1.75rem',
+              overflow: 'hidden',
+              border: '1px solid var(--line)',
+              backgroundColor: 'var(--blush)',
+              aspectRatio: '16 / 9',
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/gallery/guest-at-booth.webp"
+              alt="A guest laughing in front of the Seven Events booth under purple uplighting"
+              width={1500}
+              height={1000}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
+          </div>
         </div>
       </section>
 
@@ -210,49 +237,59 @@ export default function Home() {
               What we bring
             </span>
             <h2 style={{ color: 'var(--ink)', marginTop: '1.5rem', fontSize: 'clamp(2rem, 5vw, 3.25rem)' }}>
-              Experiences built for real guests
+              Three booths, one obsession
             </h2>
             <p style={{ fontSize: '1.1rem' }}>
-              Every setup includes a professional attendant, unlimited sessions, instant prints and a
-              same-week digital gallery.
+              Every setup includes a premium backdrop, unlimited sessions, a live gallery and free
+              travel up to 100&nbsp;km from Omemee.
             </p>
           </div>
 
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
               gap: '1.5rem',
             }}
           >
-            {experiences.map((exp) => (
-              <div
-                key={exp.name}
+            {booths.map((booth) => (
+              <Link
+                key={booth.name}
+                href="/packages"
                 style={{
                   backgroundColor: 'var(--cream)',
                   borderRadius: '1.5rem',
-                  padding: '2.25rem',
                   border: '1px solid var(--line)',
-                  minHeight: '260px',
+                  overflow: 'hidden',
+                  textDecoration: 'none',
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'space-between',
                 }}
               >
                 <div
                   style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '999px',
-                    backgroundColor: exp.tone,
-                    marginBottom: '2rem',
+                    backgroundColor: booth.panelBg,
+                    padding: '1.5rem',
+                    display: 'flex',
+                    justifyContent: 'center',
                   }}
-                />
-                <div>
-                  <h4 style={{ color: 'var(--ink)', fontSize: '1.15rem' }}>{exp.name}</h4>
-                  <p style={{ fontSize: '0.95rem', margin: 0 }}>{exp.blurb}</p>
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={booth.img}
+                    alt={`The ${booth.name}`}
+                    loading="lazy"
+                    style={{ width: '100%', maxWidth: '200px', height: '220px', objectFit: 'contain' }}
+                  />
                 </div>
-              </div>
+                <div style={{ padding: '1.75rem 2rem 2rem' }}>
+                  <h4 style={{ color: 'var(--ink)', fontSize: '1.15rem' }}>{booth.name}</h4>
+                  <p style={{ fontSize: '0.95rem', margin: '0 0 1rem' }}>{booth.blurb}</p>
+                  <span style={{ color: 'var(--clay)', fontWeight: 700, fontSize: '0.9rem' }}>
+                    See pricing →
+                  </span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -304,6 +341,60 @@ export default function Home() {
                 <h4 style={{ color: 'var(--ink)' }}>{step.title}</h4>
                 <p style={{ margin: 0, fontSize: '0.95rem' }}>{step.copy}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Recent work teaser */}
+      <section style={{ padding: '0 2rem 5rem' }}>
+        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              marginBottom: '2rem',
+            }}
+          >
+            <h2 style={{ color: 'var(--ink)', margin: 0, fontSize: 'clamp(1.75rem, 4vw, 2.5rem)' }}>
+              Recent work
+            </h2>
+            <Link href="/gallery" style={{ fontWeight: 700, fontSize: '0.95rem' }}>
+              See the full gallery →
+            </Link>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1rem',
+            }}
+          >
+            {featured.map((shot) => (
+              <Link
+                key={shot.src}
+                href="/gallery"
+                style={{
+                  display: 'block',
+                  borderRadius: '1.25rem',
+                  overflow: 'hidden',
+                  border: '1px solid var(--line)',
+                  backgroundColor: 'var(--blush)',
+                  aspectRatio: '4 / 5',
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={shot.src}
+                  alt={shot.alt}
+                  loading="lazy"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              </Link>
             ))}
           </div>
         </div>
