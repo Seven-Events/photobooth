@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import SiteNav from '@/components/site/SiteNav';
 import SiteFooter from '@/components/site/SiteFooter';
+import BoothImage from '@/components/site/BoothImage';
 
 export const metadata: Metadata = {
   title: 'Photobooth Packages & Pricing | Seven Events',
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 
 type Booth = {
   name: string;
+  slug: string;
   tagline: string;
   features: string[];
   pricing: {
@@ -23,6 +25,7 @@ type Booth = {
 const booths: Booth[] = [
   {
     name: 'Snap Booth',
+    slug: 'snap-booth',
     tagline: 'Sleek, compact and fully self-serve.',
     features: [
       'Choice of premium backdrop',
@@ -41,6 +44,7 @@ const booths: Booth[] = [
   },
   {
     name: 'Oak Booth',
+    slug: 'oak-booth',
     tagline: 'Warm wood styling with studio-quality DSLR photos.',
     features: [
       'Choice of premium backdrop',
@@ -60,6 +64,7 @@ const booths: Booth[] = [
   },
   {
     name: 'Mod Booth',
+    slug: 'mod-booth',
     tagline: 'Our full-service booth with an onsite attendant.',
     features: [
       'Choice of premium backdrop',
@@ -149,34 +154,11 @@ export default function PackagesPage() {
                     order: reversed ? 2 : 1,
                   }}
                 >
-                  <div
-                    style={{
-                      width: '100%',
-                      maxWidth: '220px',
-                      aspectRatio: '3 / 4',
-                      borderRadius: '1rem',
-                      border: '2px dashed rgba(37,70,65,0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      textAlign: 'center',
-                      padding: '1rem',
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: '0.75rem',
-                        letterSpacing: '0.14em',
-                        textTransform: 'uppercase',
-                        color: 'rgba(37,70,65,0.45)',
-                        fontWeight: 700,
-                      }}
-                    >
-                      {booth.name}
-                      <br />
-                      photo
-                    </span>
-                  </div>
+                  <BoothImage
+                    src={`/booths/${booth.slug}.png`}
+                    alt={`${booth.name} photobooth`}
+                    label={booth.name}
+                  />
                 </div>
 
                 {/* Detail panel */}
