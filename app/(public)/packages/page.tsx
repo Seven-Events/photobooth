@@ -1,10 +1,6 @@
-import Link from 'next/link';
-import { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Photobooth Packages & Pricing | Seven Events',
-  description: 'Browse our photobooth packages. From Bronze to Gold, find the perfect package for your event.',
-};
+import Link from 'next/link';
 
 export default function PackagesPage() {
   const packages = [
