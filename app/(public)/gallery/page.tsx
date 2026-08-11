@@ -1,77 +1,127 @@
 import Link from 'next/link';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import SiteNav from '@/components/site/SiteNav';
+import SiteFooter from '@/components/site/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Photo Gallery | Seven Events Photobooth',
-  description: 'Browse our collection of professional photobooth events',
+  description: 'Browse weddings, corporate events and parties we have photographed across Southern Ontario.',
 };
+
+const tiles = [
+  { label: 'Weddings', tone: 'var(--clay)', span: 2 },
+  { label: 'Corporate', tone: 'var(--sage)', span: 1 },
+  { label: 'Birthdays', tone: 'var(--sage)', span: 1 },
+  { label: 'Engagements', tone: 'var(--clay)', span: 1 },
+  { label: 'Holiday Parties', tone: 'var(--sage)', span: 1 },
+  { label: 'Fundraisers', tone: 'var(--clay)', span: 2 },
+];
 
 export default function GalleryPage() {
   return (
-    <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen">
-      <nav style={{ backgroundColor: 'var(--ink)', color: 'var(--cream)' }} className="p-4 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link href="/" style={{ fontFamily: 'Fraunces', fontSize: '1.5rem', fontWeight: 600, color: 'var(--cream)', textDecoration: 'none' }}>Seven Events</Link>
-          <div className="space-x-8 hidden md:flex">
-            <Link href="/#services" className="hover:text-white">Services</Link>
-            <Link href="/packages" className="hover:text-white">Packages</Link>
-            <Link href="/gallery" className="hover:text-white font-semibold">Gallery</Link>
-            <Link href="/faq" className="hover:text-white">FAQs</Link>
-            <Link href="/contact" className="hover:text-white">Contact</Link>
-            <Link href="/book" style={{ color: 'var(--clay)' }} className="font-semibold">Book Now</Link>
-          </div>
-        </div>
-      </nav>
+    <main style={{ backgroundColor: 'var(--cream)' }}>
+      <SiteNav />
 
-      <section style={{ padding: '4rem 2rem' }}>
-        <div className="max-w-6xl mx-auto">
-          <h1 style={{ fontFamily: 'Fraunces', fontSize: '2.5rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '3rem' }}>
-            Event Gallery
+      <section style={{ padding: '6rem 2rem 4rem', textAlign: 'center' }}>
+        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+          <span className="pill" style={{ backgroundColor: 'var(--sage)', color: 'var(--ink)' }}>
+            Recent work
+          </span>
+          <h1
+            style={{
+              color: 'var(--ink)',
+              fontSize: 'clamp(2.5rem, 7vw, 4.5rem)',
+              margin: '1.75rem 0 1.25rem',
+            }}
+          >
+            Event gallery
           </h1>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {[...Array(9)].map((_, i) => (
-              <div key={i} style={{
-                backgroundColor: 'var(--paper)',
-                borderRadius: '0.5rem',
-                height: '250px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--ink)',
-                textAlign: 'center',
-              }}>
-                <div>
-                  <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>📸</div>
-                  <p>Gallery Coming Soon</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ backgroundColor: 'var(--blush)', padding: '2rem', borderRadius: '0.5rem', textAlign: 'center' }}>
-            <h2 style={{ fontFamily: 'Fraunces', fontSize: '1.5rem', color: 'var(--ink)', marginBottom: '1rem' }}>
-              Ready to Create Memories?
-            </h2>
-            <p style={{ color: 'var(--ink)', marginBottom: '2rem' }}>
-              Book your photobooth and see your event featured in our gallery
-            </p>
-            <Link href="/book" style={{ display: 'inline-block', backgroundColor: 'var(--clay)', color: 'var(--ink)', padding: '0.75rem 1.5rem', borderRadius: '0.25rem', fontWeight: 600, textDecoration: 'none' }}>
-              Book Now
-            </Link>
-          </div>
+          <p style={{ fontSize: '1.15rem' }}>
+            A look at the rooms we have worked and the people we have photographed.
+          </p>
         </div>
       </section>
 
-      <footer style={{ backgroundColor: 'var(--ink)', color: 'var(--cream)', padding: '3rem 2rem', marginTop: '3rem' }}>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-6">
-          <div><h4 style={{ fontFamily: 'Fraunces', marginBottom: '1rem' }}>Navigation</h4><Link href="/" style={{ color: 'var(--cream)', textDecoration: 'none', fontSize: '0.875rem' }}>Home</Link></div>
-          <div><h4 style={{ fontFamily: 'Fraunces', marginBottom: '1rem' }}>Service Areas</h4><Link href="/kawartha-lakes" style={{ color: 'var(--cream)', textDecoration: 'none', fontSize: '0.875rem' }}>Kawartha Lakes</Link></div>
-          <div><h4 style={{ fontFamily: 'Fraunces', marginBottom: '1rem' }}>Legal</h4><Link href="/privacy" style={{ color: 'var(--cream)', textDecoration: 'none', fontSize: '0.875rem' }}>Privacy</Link></div>
-          <div><h4 style={{ fontFamily: 'Fraunces', marginBottom: '1rem' }}>Contact</h4><p style={{ fontSize: '0.875rem' }}>info@seveneventsphotobooth.com</p></div>
+      <section style={{ padding: '0 2rem 5rem' }}>
+        <div
+          style={{
+            maxWidth: '1180px',
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '1.25rem',
+          }}
+        >
+          {tiles.map((tile) => (
+            <div
+              key={tile.label}
+              style={{
+                borderRadius: '1.5rem',
+                minHeight: '280px',
+                backgroundColor: 'var(--paper)',
+                border: '1px solid var(--line)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                padding: '2rem',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: `linear-gradient(160deg, ${tile.tone}33, transparent 65%)`,
+                }}
+              />
+              <div style={{ position: 'relative' }}>
+                <span
+                  className="pill"
+                  style={{ backgroundColor: tile.tone, color: 'var(--ink)', marginBottom: '0.75rem' }}
+                >
+                  {tile.label}
+                </span>
+                <p style={{ margin: '0.75rem 0 0', fontSize: '0.9rem' }}>Photos coming soon</p>
+              </div>
+            </div>
+          ))}
         </div>
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '2rem', textAlign: 'center' }}><p style={{ fontSize: '0.875rem' }}>&copy; 2024 Seven Events Photobooth</p></div>
-      </footer>
+
+        <div
+          style={{
+            maxWidth: '1180px',
+            margin: '3rem auto 0',
+            backgroundColor: 'var(--ink)',
+            borderRadius: '1.75rem',
+            padding: '3.5rem 2.5rem',
+            textAlign: 'center',
+          }}
+        >
+          <h3 style={{ color: 'var(--cream)', fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', marginBottom: '1rem' }}>
+            Want your event featured?
+          </h3>
+          <p style={{ color: 'rgba(250,247,239,0.75)', marginBottom: '2rem' }}>
+            Book a booth and we will add your highlights to the gallery.
+          </p>
+          <Link
+            href="/book"
+            style={{
+              display: 'inline-block',
+              backgroundColor: 'var(--clay)',
+              color: 'var(--ink)',
+              padding: '1rem 2.25rem',
+              borderRadius: '999px',
+              fontWeight: 700,
+              textDecoration: 'none',
+            }}
+          >
+            Book Now →
+          </Link>
+        </div>
+      </section>
+
+      <SiteFooter />
     </main>
   );
 }

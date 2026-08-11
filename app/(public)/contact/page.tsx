@@ -1,76 +1,116 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import SiteNav from '@/components/site/SiteNav';
+import SiteFooter from '@/components/site/SiteFooter';
+
+export const metadata: Metadata = {
+  title: 'Contact | Seven Events Photobooth',
+  description:
+    'Get in touch about photobooth rental in Kawartha Lakes, Prince Edward County, Belleville and Durham Region.',
+};
 
 export default function ContactPage() {
   return (
-    <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen">
-      <nav style={{ backgroundColor: 'var(--ink)', color: 'var(--cream)' }} className="p-4 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link href="/" style={{ fontFamily: 'Fraunces', fontSize: '1.5rem', fontWeight: 600, color: 'var(--cream)', textDecoration: 'none' }}>Seven Events</Link>
-          <div className="space-x-8 hidden md:flex">
-            <Link href="/#services" className="hover:text-white">Services</Link>
-            <Link href="/packages" className="hover:text-white">Packages</Link>
-            <Link href="/gallery" className="hover:text-white">Gallery</Link>
-            <Link href="/faq" className="hover:text-white">FAQs</Link>
-            <Link href="/contact" className="hover:text-white font-semibold">Contact</Link>
-            <Link href="/book" style={{ color: 'var(--clay)' }} className="font-semibold">Book Now</Link>
-          </div>
-        </div>
-      </nav>
+    <main style={{ backgroundColor: 'var(--cream)' }}>
+      <SiteNav />
 
-      <section style={{ padding: '4rem 2rem' }}>
-        <div className="max-w-3xl mx-auto">
-          <h1 style={{ fontFamily: 'Fraunces', fontSize: '2.5rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '3rem' }}>
-            Get in Touch
+      <section style={{ padding: '6rem 2rem 4rem', textAlign: 'center' }}>
+        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+          <span className="pill" style={{ backgroundColor: 'var(--sage)', color: 'var(--ink)' }}>
+            Say hello
+          </span>
+          <h1
+            style={{
+              color: 'var(--ink)',
+              fontSize: 'clamp(2.5rem, 7vw, 4.5rem)',
+              margin: '1.75rem 0 1.25rem',
+            }}
+          >
+            Get in touch
           </h1>
+          <p style={{ fontSize: '1.15rem' }}>
+            Tell us the date, the venue, and the vibe. We will come back with availability and a quote.
+          </p>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="card">
-              <h3 style={{ fontFamily: 'Fraunces', fontSize: '1.25rem', color: 'var(--ink)', marginBottom: '1rem' }}>
-                Contact Information
-              </h3>
-              <div style={{ color: 'var(--ink)' }}>
-                <p style={{ marginBottom: '1rem' }}>
-                  <strong>Email:</strong><br/>
-                  info@seveneventsphotobooth.com
-                </p>
-                <p style={{ marginBottom: '1rem' }}>
-                  <strong>Service Areas:</strong><br/>
-                  Kawartha Lakes, Prince Edward County, Belleville, Durham Region
-                </p>
-                <p>
-                  <strong>Response Time:</strong><br/>
-                  We typically reply within 24 hours
-                </p>
-              </div>
-            </div>
-
-            <div className="card">
-              <h3 style={{ fontFamily: 'Fraunces', fontSize: '1.25rem', color: 'var(--ink)', marginBottom: '1rem' }}>
-                Quick Booking
-              </h3>
-              <p style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
-                Ready to book? Head over to our booking page to get started right away.
-              </p>
-              <Link href="/book" style={{ display: 'inline-block', backgroundColor: 'var(--clay)', color: 'var(--ink)', padding: '0.75rem 1.5rem', borderRadius: '0.25rem', fontWeight: 600, textDecoration: 'none' }}>
-                Book Now
-              </Link>
-            </div>
+      <section style={{ padding: '0 2rem 5rem' }}>
+        <div
+          style={{
+            maxWidth: '1000px',
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '1.5rem',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: 'var(--paper)',
+              borderRadius: '1.5rem',
+              padding: '2.5rem',
+              border: '1px solid var(--line)',
+            }}
+          >
+            <h4 style={{ color: 'var(--ink)' }}>Email us</h4>
+            <a
+              href="mailto:info@seveneventsphotobooth.com"
+              style={{ color: 'var(--clay)', fontWeight: 600, wordBreak: 'break-word' }}
+            >
+              info@seveneventsphotobooth.com
+            </a>
+            <p style={{ marginTop: '1.5rem', fontSize: '0.95rem', marginBottom: 0 }}>
+              We typically reply within 24 hours, seven days a week.
+            </p>
           </div>
 
-          <div style={{ backgroundColor: 'var(--blush)', padding: '2rem', borderRadius: '0.5rem', marginTop: '3rem', textAlign: 'center' }}>
-            <h2 style={{ fontFamily: 'Fraunces', fontSize: '1.5rem', color: 'var(--ink)', marginBottom: '1rem' }}>
-              Questions Before Booking?
-            </h2>
-            <p style={{ color: 'var(--ink)' }}>
-              Email us at info@seveneventsphotobooth.com and we'll be happy to help!
+          <div
+            style={{
+              backgroundColor: 'var(--paper)',
+              borderRadius: '1.5rem',
+              padding: '2.5rem',
+              border: '1px solid var(--line)',
+            }}
+          >
+            <h4 style={{ color: 'var(--ink)' }}>Service areas</h4>
+            <p style={{ fontSize: '0.95rem', marginBottom: 0 }}>
+              Kawartha Lakes, Prince Edward County, Belleville and Durham Region — plus surrounding
+              Southern Ontario by request.
             </p>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: 'var(--ink)',
+              borderRadius: '1.5rem',
+              padding: '2.5rem',
+              color: 'var(--cream)',
+            }}
+          >
+            <h4 style={{ color: 'var(--cream)' }}>Ready to book?</h4>
+            <p style={{ color: 'rgba(250,247,239,0.75)', fontSize: '0.95rem' }}>
+              Skip the back and forth — check your date and reserve online.
+            </p>
+            <Link
+              href="/book"
+              style={{
+                display: 'inline-block',
+                marginTop: '1rem',
+                backgroundColor: 'var(--clay)',
+                color: 'var(--ink)',
+                padding: '0.9rem 2rem',
+                borderRadius: '999px',
+                fontWeight: 700,
+                textDecoration: 'none',
+              }}
+            >
+              Book Now →
+            </Link>
           </div>
         </div>
       </section>
 
-      <footer style={{ backgroundColor: 'var(--ink)', color: 'var(--cream)', padding: '3rem 2rem', marginTop: '3rem', textAlign: 'center' }}>
-        <p style={{ fontSize: '0.875rem' }}>&copy; 2024 Seven Events Photobooth</p>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

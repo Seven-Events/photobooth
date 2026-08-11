@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
+import SiteNav from '@/components/site/SiteNav';
+import SiteFooter from '@/components/site/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Prince Edward County Photobooth | Premium Photo Booth Rental',
@@ -14,20 +16,10 @@ export const metadata: Metadata = {
 export default function PECPage() {
   return (
     <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen">
-      <nav style={{ backgroundColor: 'var(--ink)', color: 'var(--cream)' }} className="p-4 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link href="/" style={{ fontFamily: 'Fraunces', fontSize: '1.5rem', fontWeight: 600 }}>
-            Seven Events Photobooth
-          </Link>
-          <div className="space-x-6 hidden md:flex">
-            <Link href="/#packages" className="hover:text-white">Packages</Link>
-            <Link href="/prince-edward-county#book" style={{ color: 'var(--clay)' }} className="font-semibold">Book Now</Link>
-          </div>
-        </div>
-      </nav>
+      <SiteNav />
 
       <section className="px-4 py-16 text-center max-w-4xl mx-auto">
-        <h1 style={{ fontFamily: 'Fraunces', fontSize: '3rem', color: 'var(--ink)' }} className="mb-6">
+        <h1 style={{ fontSize: '3rem', color: 'var(--ink)' }} className="mb-6">
           Prince Edward County Photobooth
         </h1>
         <h2 style={{ fontSize: '1.5rem', color: 'var(--clay)', marginBottom: '1rem' }}>
@@ -43,13 +35,13 @@ export default function PECPage() {
 
       <section style={{ backgroundColor: 'var(--paper)', padding: '3rem' }} className="my-12">
         <div className="max-w-4xl mx-auto">
-          <h3 style={{ fontFamily: 'Fraunces', fontSize: '2rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
+          <h3 style={{ fontSize: '2rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
             Why Choose Seven Events for Your PEC Event?
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Professional Quality
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -58,7 +50,7 @@ export default function PECPage() {
             </div>
 
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Rustic & Elegant Themes
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -67,7 +59,7 @@ export default function PECPage() {
             </div>
 
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Instant Prints & Digital
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -76,7 +68,7 @@ export default function PECPage() {
             </div>
 
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Outdoor-Ready
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -85,7 +77,7 @@ export default function PECPage() {
             </div>
 
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Fun Props & Accessories
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -94,7 +86,7 @@ export default function PECPage() {
             </div>
 
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Professional Attendant
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -106,14 +98,14 @@ export default function PECPage() {
       </section>
 
       <section className="px-4 py-16 max-w-4xl mx-auto">
-        <h3 style={{ fontFamily: 'Fraunces', fontSize: '2rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
+        <h3 style={{ fontSize: '2rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
           Simple & Fun Process
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📸</div>
-            <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+            <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
               Strike a Pose
             </h4>
             <p style={{ color: 'var(--ink)' }}>
@@ -123,7 +115,7 @@ export default function PECPage() {
 
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✨</div>
-            <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+            <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
               Smile & Snap
             </h4>
             <p style={{ color: 'var(--ink)' }}>
@@ -133,7 +125,7 @@ export default function PECPage() {
 
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎁</div>
-            <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+            <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
               Take & Share
             </h4>
             <p style={{ color: 'var(--ink)' }}>
@@ -145,7 +137,7 @@ export default function PECPage() {
 
       <section id="book" style={{ backgroundColor: 'var(--paper)', padding: '3rem' }} className="my-12">
         <div className="max-w-4xl mx-auto text-center">
-          <h3 style={{ fontFamily: 'Fraunces', fontSize: '2rem', color: 'var(--ink)', marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '2rem', color: 'var(--ink)', marginBottom: '1rem' }}>
             Ready to Add Photobooth Magic to Your Prince Edward County Event?
           </h3>
           <p style={{ color: 'var(--ink)', marginBottom: '2rem' }}>
@@ -157,9 +149,7 @@ export default function PECPage() {
         </div>
       </section>
 
-      <footer style={{ backgroundColor: 'var(--ink)', color: 'var(--cream)' }} className="py-8 mt-12 text-center">
-        <p>&copy; 2024 Seven Events Photobooth. All rights reserved.</p>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

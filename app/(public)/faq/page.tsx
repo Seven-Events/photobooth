@@ -1,68 +1,110 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import SiteNav from '@/components/site/SiteNav';
+import SiteFooter from '@/components/site/SiteFooter';
+
+export const metadata: Metadata = {
+  title: 'Photobooth FAQs | Seven Events',
+  description:
+    'Answers to common photobooth rental questions: rental length, backdrops, prints, digital sharing and booking lead time.',
+};
+
+const faqs = [
+  { q: 'How long does the photobooth rental last?', a: 'Our packages range from 2 to 8 hours. We also offer hourly add-ons for extended events.' },
+  { q: 'Can I customize the backdrop?', a: 'Absolutely. We offer custom backdrop designs tailored to your event theme and branding.' },
+  { q: 'How many guests can use the photobooth?', a: 'All our packages support unlimited guests and unlimited sessions.' },
+  { q: 'Do you provide instant prints?', a: 'Yes. Guests receive instant printed photos from every session.' },
+  { q: 'Can guests share photos digitally?', a: 'Yes, they can share directly to social media or receive digital copies by email.' },
+  { q: 'What if my event is outside your service area?', a: 'Get in touch to discuss custom arrangements. We can often accommodate travel requests.' },
+  { q: 'How far in advance should I book?', a: 'We recommend booking at least 2 to 4 weeks in advance for the best availability.' },
+  { q: 'Is a professional attendant included?', a: 'Yes, every package includes an attendant who runs the booth for the full rental.' },
+];
 
 export default function FAQPage() {
-  const faqs = [
-    { q: 'How long does the photobooth rental last?', a: 'Our packages range from 2 to 8 hours. We also offer hourly add-ons for extended events.' },
-    { q: 'Can I customize the backdrop?', a: 'Absolutely! We offer custom backdrop designs tailored to your event theme and branding.' },
-    { q: 'How many guests can use the photobooth?', a: 'All our packages support unlimited guests. The more people, the more fun!' },
-    { q: 'Do you provide instant prints?', a: 'Yes! Guests receive instant printed photos from every session.' },
-    { q: 'Can guests share photos digitally?', a: 'Yes, they can share directly to social media or receive digital copies via email.' },
-    { q: 'What if I need the photobooth outside our service area?', a: 'Contact us to discuss custom arrangements. We may be able to accommodate requests.' },
-    { q: 'How far in advance should I book?', a: 'We recommend booking at least 2-4 weeks in advance for best availability.' },
-    { q: 'Is a professional attendant included?', a: 'Yes, all packages include a professional attendant to manage the photobooth.' },
-  ];
-
   return (
-    <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen">
-      <nav style={{ backgroundColor: 'var(--ink)', color: 'var(--cream)' }} className="p-4 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link href="/" style={{ fontFamily: 'Fraunces', fontSize: '1.5rem', fontWeight: 600, color: 'var(--cream)', textDecoration: 'none' }}>Seven Events</Link>
-          <div className="space-x-8 hidden md:flex">
-            <Link href="/#services" className="hover:text-white">Services</Link>
-            <Link href="/packages" className="hover:text-white">Packages</Link>
-            <Link href="/gallery" className="hover:text-white">Gallery</Link>
-            <Link href="/faq" className="hover:text-white font-semibold">FAQs</Link>
-            <Link href="/contact" className="hover:text-white">Contact</Link>
-            <Link href="/book" style={{ color: 'var(--clay)' }} className="font-semibold">Book Now</Link>
-          </div>
-        </div>
-      </nav>
+    <main style={{ backgroundColor: 'var(--cream)' }}>
+      <SiteNav />
 
-      <section style={{ padding: '4rem 2rem' }}>
-        <div className="max-w-3xl mx-auto">
-          <h1 style={{ fontFamily: 'Fraunces', fontSize: '2.5rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '3rem' }}>
-            Frequently Asked Questions
+      <section style={{ padding: '6rem 2rem 4rem', textAlign: 'center' }}>
+        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+          <span className="pill" style={{ backgroundColor: 'var(--sage)', color: 'var(--ink)' }}>
+            Good to know
+          </span>
+          <h1
+            style={{
+              color: 'var(--ink)',
+              fontSize: 'clamp(2.5rem, 7vw, 4.5rem)',
+              margin: '1.75rem 0 1.25rem',
+            }}
+          >
+            Frequently asked questions
           </h1>
-
-          <div className="space-y-6">
-            {faqs.map((item, i) => (
-              <div key={i} className="card">
-                <h3 style={{ fontFamily: 'Fraunces', fontSize: '1.1rem', color: 'var(--ink)', marginBottom: '0.75rem' }}>
-                  {item.q}
-                </h3>
-                <p style={{ color: 'var(--ink)', lineHeight: '1.6' }}>
-                  {item.a}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ backgroundColor: 'var(--blush)', padding: '2rem', borderRadius: '0.5rem', marginTop: '3rem', textAlign: 'center' }}>
-            <h2 style={{ fontFamily: 'Fraunces', fontSize: '1.5rem', color: 'var(--ink)', marginBottom: '1rem' }}>
-              Still have questions?
-            </h2>
-            <Link href="/contact" style={{ display: 'inline-block', backgroundColor: 'var(--clay)', color: 'var(--ink)', padding: '0.75rem 1.5rem', borderRadius: '0.25rem', fontWeight: 600, textDecoration: 'none' }}>
-              Contact Us
-            </Link>
-          </div>
+          <p style={{ fontSize: '1.15rem' }}>
+            Everything couples and planners ask us before booking. Still stuck? We reply within a day.
+          </p>
         </div>
       </section>
 
-      <footer style={{ backgroundColor: 'var(--ink)', color: 'var(--cream)', padding: '3rem 2rem', marginTop: '3rem' }}>
-        <div style={{ maxWidth: '6rem', margin: '0 auto', textAlign: 'center', fontSize: '0.875rem' }}>
-          &copy; 2024 Seven Events Photobooth
+      <section style={{ padding: '0 2rem 5rem' }}>
+        <div
+          style={{
+            maxWidth: '900px',
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '1.25rem',
+          }}
+        >
+          {faqs.map((item) => (
+            <div
+              key={item.q}
+              style={{
+                backgroundColor: 'var(--paper)',
+                borderRadius: '1.25rem',
+                padding: '2rem',
+                border: '1px solid var(--line)',
+              }}
+            >
+              <h4 style={{ color: 'var(--ink)', fontSize: '1.05rem' }}>{item.q}</h4>
+              <p style={{ fontSize: '0.95rem', margin: 0 }}>{item.a}</p>
+            </div>
+          ))}
         </div>
-      </footer>
+
+        <div
+          style={{
+            maxWidth: '900px',
+            margin: '3rem auto 0',
+            backgroundColor: 'var(--ink)',
+            borderRadius: '1.75rem',
+            padding: '3rem 2.5rem',
+            textAlign: 'center',
+          }}
+        >
+          <h3 style={{ color: 'var(--cream)', fontSize: '1.75rem', marginBottom: '1rem' }}>
+            Still have questions?
+          </h3>
+          <p style={{ color: 'rgba(250,247,239,0.75)', marginBottom: '2rem' }}>
+            Send us a note and we will get back to you within 24 hours.
+          </p>
+          <Link
+            href="/contact"
+            style={{
+              display: 'inline-block',
+              backgroundColor: 'var(--clay)',
+              color: 'var(--ink)',
+              padding: '1rem 2.25rem',
+              borderRadius: '999px',
+              fontWeight: 700,
+              textDecoration: 'none',
+            }}
+          >
+            Contact Us →
+          </Link>
+        </div>
+      </section>
+
+      <SiteFooter />
     </main>
   );
 }

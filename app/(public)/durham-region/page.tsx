@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
+import SiteNav from '@/components/site/SiteNav';
+import SiteFooter from '@/components/site/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Durham Region Photobooth | Ajax, Pickering, Whitby, Oshawa',
@@ -10,20 +12,10 @@ export const metadata: Metadata = {
 export default function DurhamPage() {
   return (
     <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen">
-      <nav style={{ backgroundColor: 'var(--ink)', color: 'var(--cream)' }} className="p-4 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link href="/" style={{ fontFamily: 'Fraunces', fontSize: '1.5rem', fontWeight: 600 }}>
-            Seven Events Photobooth
-          </Link>
-          <div className="space-x-6 hidden md:flex">
-            <Link href="/#packages" className="hover:text-white">Packages</Link>
-            <Link href="/durham-region#book" style={{ color: 'var(--clay)' }} className="font-semibold">Book Now</Link>
-          </div>
-        </div>
-      </nav>
+      <SiteNav />
 
       <section className="px-4 py-16 text-center max-w-4xl mx-auto">
-        <h1 style={{ fontFamily: 'Fraunces', fontSize: '3rem', color: 'var(--ink)' }} className="mb-6">
+        <h1 style={{ fontSize: '3rem', color: 'var(--ink)' }} className="mb-6">
           Durham Region Photobooth
         </h1>
         <h2 style={{ fontSize: '1.5rem', color: 'var(--clay)', marginBottom: '1rem' }}>
@@ -39,13 +31,13 @@ export default function DurhamPage() {
 
       <section style={{ backgroundColor: 'var(--paper)', padding: '3rem' }} className="my-12">
         <div className="max-w-4xl mx-auto">
-          <h3 style={{ fontFamily: 'Fraunces', fontSize: '2rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
+          <h3 style={{ fontSize: '2rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
             Why Durham Events Choose Seven Events
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Professional Photography
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -54,7 +46,7 @@ export default function DurhamPage() {
             </div>
 
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Personalized Experiences
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -63,7 +55,7 @@ export default function DurhamPage() {
             </div>
 
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Instant Prints & Digital
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -72,7 +64,7 @@ export default function DurhamPage() {
             </div>
 
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Professional Service
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -81,7 +73,7 @@ export default function DurhamPage() {
             </div>
 
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Extensive Prop Selection
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -90,7 +82,7 @@ export default function DurhamPage() {
             </div>
 
             <div>
-              <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 Guest Engagement
               </h4>
               <p style={{ color: 'var(--ink)' }}>
@@ -102,26 +94,26 @@ export default function DurhamPage() {
       </section>
 
       <section className="px-4 py-16 max-w-4xl mx-auto">
-        <h3 style={{ fontFamily: 'Fraunces', fontSize: '2rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
+        <h3 style={{ fontSize: '2rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
           How Our Photobooth Works
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📸</div>
-            <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>Enter & Choose</h4>
+            <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>Enter & Choose</h4>
             <p style={{ color: 'var(--ink)' }}>Pick your favorite props from our fun collection.</p>
           </div>
 
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✨</div>
-            <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>Capture the Moment</h4>
+            <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>Capture the Moment</h4>
             <p style={{ color: 'var(--ink)' }}>Professional photos that capture genuine smiles and joy.</p>
           </div>
 
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎁</div>
-            <h4 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>Take Home Memories</h4>
+            <h4 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>Take Home Memories</h4>
             <p style={{ color: 'var(--ink)' }}>Instant prints and digital copies you'll treasure forever.</p>
           </div>
         </div>
@@ -135,7 +127,7 @@ export default function DurhamPage() {
 
       <section id="book" style={{ backgroundColor: 'var(--paper)', padding: '3rem' }} className="my-12">
         <div className="max-w-4xl mx-auto text-center">
-          <h3 style={{ fontFamily: 'Fraunces', fontSize: '2rem', color: 'var(--ink)', marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '2rem', color: 'var(--ink)', marginBottom: '1rem' }}>
             Ready to Book for Your Durham Event?
           </h3>
           <p style={{ color: 'var(--ink)', marginBottom: '2rem' }}>
@@ -147,9 +139,7 @@ export default function DurhamPage() {
         </div>
       </section>
 
-      <footer style={{ backgroundColor: 'var(--ink)', color: 'var(--cream)' }} className="py-8 mt-12 text-center">
-        <p>&copy; 2024 Seven Events Photobooth. All rights reserved.</p>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

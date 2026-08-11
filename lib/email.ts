@@ -1,6 +1,11 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let client: Resend | null = null;
+
+function resend() {
+  if (!client) client = new Resend(process.env.RESEND_API_KEY);
+  return client;
+}
 
 export async function sendBookingConfirmationEmail(
   email: string,
@@ -12,7 +17,7 @@ export async function sendBookingConfirmationEmail(
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
   try {
-    await resend.emails.send({
+    await resend().emails.send({
       from: 'noreply@seveneventsphotobooth.com',
       to: email,
       subject: 'Your Photobooth Booking Confirmed',
@@ -63,7 +68,7 @@ export async function sendPasswordResetEmail(
   resetLink: string
 ) {
   try {
-    await resend.emails.send({
+    await resend().emails.send({
       from: 'noreply@seveneventsphotobooth.com',
       to: email,
       subject: 'Reset Your Photobooth Account Password',
