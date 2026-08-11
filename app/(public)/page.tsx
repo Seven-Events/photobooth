@@ -20,13 +20,13 @@ const booths = [
   },
   {
     name: 'Oak Booth',
-    blurb: 'Warm wood styling with studio-quality DSLR photos and prints.',
+    blurb: 'Warm wood styling on a hardwood tripod. Print drop-off from $750.',
     img: '/booths/oak-booth.webp',
     panelBg: '#ede3db',
   },
   {
     name: 'Mod Booth',
-    blurb: 'Our full-service booth, staffed by an onsite attendant.',
+    blurb: 'Full-service with an onsite attendant. Hourly, or $1,200 for a wedding.',
     img: '/booths/mod-booth.webp',
     panelBg: '#ede3db',
   },
@@ -90,6 +90,10 @@ My fiancé didn't even want a photo booth, but he admits with joy that Seven Eve
 
 /** What actually removes hesitation at the point of booking. */
 const included = [
+  {
+    title: 'A real camera, not a tablet',
+    copy: 'Every booth runs a high-quality DSLR with professional studio lighting — the difference shows on the print.',
+  },
   {
     title: 'No surprise travel fees',
     copy: 'Free travel up to 100 km from Omemee — most of Kawartha Lakes, PEC, Belleville and Durham is covered.',

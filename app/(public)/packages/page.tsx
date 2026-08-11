@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import SiteNav from '@/components/site/SiteNav';
@@ -10,21 +11,43 @@ export const metadata: Metadata = {
     'Snap, Oak and Mod photobooth packages from $500. Drop-off, hourly and the Completely Captured wedding package, with free travel up to 100 km from Omemee.',
 };
 
+type Rate = { label: string; price: string; note: string; badge?: string };
+
 type Booth = {
   name: string;
   slug: string;
   /** Matches the flat backdrop baked into the product shot so it blends in. */
   panelBg: string;
   tagline: string;
-  features: string[];
-  pricing: {
-    label: string;
-    price: string;
-    note: string;
-  } | null;
-  /** Optional pointer to the hourly table for booths sold by the hour too. */
-  alsoHourly?: boolean;
+  /** Listed above the shared features, for anything unique to this booth. */
+  extraFeatures?: string[];
+  /** Fixed-price options. Empty means the booth is sold by the hour only. */
+  rates: Rate[];
+  /** Show the attendant-staffed hourly rates on this booth's card. */
+  showHourly?: boolean;
 };
+
+/**
+ * True of every booth — kept in one place so the lists cannot drift apart.
+ * All three carry a DSLR body and studio lighting.
+ */
+const sharedFeatures = [
+  'Choice of premium backdrop',
+  'High-quality DSLR camera',
+  'Professional studio lighting',
+  'Photos, videos and boomerangs',
+  'Video guestbook',
+  'Personalized image template',
+  'Live gallery',
+  'Instant sharing via text & email',
+  'Free travel up to 100 km from Omemee',
+];
+
+const hourly = [
+  { duration: '2 hours', digital: '$600', prints: '$800' },
+  { duration: '3 hours', digital: '$750', prints: '$950' },
+  { duration: '4 hours', digital: '$900', prints: '$1100' },
+];
 
 const booths: Booth[] = [
   {
@@ -32,71 +55,43 @@ const booths: Booth[] = [
     slug: 'snap-booth',
     panelBg: '#ede3db',
     tagline: 'Sleek, compact and fully self-serve.',
-    features: [
-      'Choice of premium backdrop',
-      'Photos, videos and boomerangs',
-      'Video guestbook',
-      'Personalized image template',
-      'Live gallery',
-      'Instant sharing via text & email',
-      'Free travel up to 100 km from Omemee',
+    rates: [
+      {
+        label: 'Digital Drop-off',
+        price: '$500',
+        note: 'Up to 14 hours unlimited use — no attendant, no prints',
+      },
     ],
-    pricing: {
-      label: 'Digital Drop-off',
-      price: '$500',
-      note: 'Up to 14 hours unlimited use — no attendant, no prints',
-    },
   },
   {
     name: 'Oak Booth',
     slug: 'oak-booth',
     panelBg: '#ede3db',
-    tagline: 'Warm wood styling with studio-quality DSLR photos.',
-    features: [
-      'Choice of premium backdrop',
-      'Studio quality DSLR photos',
-      'Photos, videos and boomerangs',
-      'Video guestbook',
-      'Personalized image template',
-      'Live gallery',
-      'Instant sharing via text & email',
-      'Free travel up to 100 km from Omemee',
+    tagline: 'Warm wood styling on a hardwood tripod.',
+    rates: [
+      {
+        label: 'Print Drop-off',
+        price: '$750',
+        note: 'Up to 14 hours unlimited use — no attendant, max 300 prints',
+      },
     ],
-    pricing: {
-      label: 'Print Drop-off',
-      price: '$750',
-      note: 'Up to 14 hours unlimited use — no attendant, max 300 prints',
-    },
   },
   {
     name: 'Mod Booth',
     slug: 'mod-booth',
     panelBg: '#ede3db',
-    tagline: 'Our full-service booth with an onsite attendant.',
-    features: [
-      'Choice of premium backdrop',
-      'Studio quality DSLR photos',
-      'Onsite attendant',
-      'Photos, videos and boomerangs',
-      'Video guestbook',
-      'Personalized image template',
-      'Live gallery',
-      'Instant sharing via text & email',
-      'Free travel up to 100 km from Omemee',
+    tagline: 'Our full-service booth, staffed by an onsite attendant.',
+    extraFeatures: ['Onsite attendant'],
+    rates: [
+      {
+        label: 'Completely Captured',
+        price: '$1,200',
+        note: '+ tax · 1.5 hrs cocktail hour plus 3 hrs reception — split coverage so there is never a line',
+        badge: 'Best for weddings',
+      },
     ],
-    pricing: {
-      label: 'Completely Captured',
-      price: '$1,200',
-      note: '+ tax · 1.5 hrs of cocktail hour plus 3 hrs of reception — split coverage so there is never a line',
-    },
-    alsoHourly: true,
+    showHourly: true,
   },
-];
-
-const hourly = [
-  { duration: '2 hours', digital: '$600', prints: '$800' },
-  { duration: '3 hours', digital: '$750', prints: '$950' },
-  { duration: '4 hours', digital: '$900', prints: '$1100' },
 ];
 
 export default function PackagesPage() {
@@ -206,7 +201,7 @@ export default function PackagesPage() {
                   <p style={{ marginBottom: '1.5rem', fontSize: '1rem' }}>{booth.tagline}</p>
 
                   <ul style={{ listStyle: 'none', margin: 0, padding: 0, flex: 1 }}>
-                    {booth.features.map((f) => (
+                    {[...(booth.extraFeatures ?? []), ...sharedFeatures].map((f) => (
                       <li
                         key={f}
                         style={{
@@ -225,72 +220,105 @@ export default function PackagesPage() {
                     ))}
                   </ul>
 
-                  {booth.pricing ? (
-                    <div style={{ marginTop: '2rem', paddingTop: '1.75rem', borderTop: '1px solid var(--line)' }}>
-                      <p style={{ margin: 0, fontSize: '1.15rem', color: 'var(--ink)', fontWeight: 600 }}>
-                        {booth.pricing.label} —{' '}
-                        <strong
-                          style={{
-                            fontFamily: "'Archivo Black', sans-serif",
-                            fontSize: '1.6rem',
-                            color: 'var(--clay)',
-                          }}
-                        >
-                          {booth.pricing.price}
-                        </strong>
-                      </p>
-                      <p
-                        style={{
-                          margin: '0.5rem 0 1.5rem',
-                          fontSize: '0.85rem',
-                          color: 'rgba(37,70,65,0.6)',
-                        }}
-                      >
-                        {booth.pricing.note}
-                      </p>
-                      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                        <Link
-                          href="/book"
-                          style={{
-                            display: 'inline-block',
-                            padding: '0.9rem 2rem',
-                            borderRadius: '999px',
-                            fontWeight: 700,
-                            textDecoration: 'none',
-                            backgroundColor: 'var(--ink)',
-                            color: 'var(--cream)',
-                          }}
-                        >
-                          Book the {booth.name} →
-                        </Link>
-                        {booth.alsoHourly && (
-                          <a href="#hourly" style={{ fontWeight: 700, fontSize: '0.9rem' }}>
-                            or book it by the hour ↓
-                          </a>
+                  <div style={{ marginTop: '2rem', paddingTop: '1.75rem', borderTop: '1px solid var(--line)' }}>
+                    {booth.rates.map((rate) => (
+                      <div key={rate.label} style={{ marginBottom: '1.5rem' }}>
+                        {rate.badge && (
+                          <span
+                            className="pill"
+                            style={{
+                              backgroundColor: 'var(--clay)',
+                              color: 'var(--ink)',
+                              marginBottom: '0.75rem',
+                            }}
+                          >
+                            {rate.badge}
+                          </span>
                         )}
+                        <p style={{ margin: 0, fontSize: '1.15rem', color: 'var(--ink)', fontWeight: 600 }}>
+                          {rate.label} —{' '}
+                          <strong
+                            style={{
+                              fontFamily: "'Archivo Black', sans-serif",
+                              fontSize: '1.6rem',
+                              color: 'var(--clay)',
+                            }}
+                          >
+                            {rate.price}
+                          </strong>
+                        </p>
+                        <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'rgba(37,70,65,0.6)' }}>
+                          {rate.note}
+                        </p>
                       </div>
-                    </div>
-                  ) : (
-                    <div style={{ marginTop: '2rem', paddingTop: '1.75rem', borderTop: '1px solid var(--line)' }}>
-                      <p style={{ margin: '0 0 1.5rem', fontSize: '0.95rem', color: 'rgba(37,70,65,0.7)' }}>
-                        Available with our attendant-staffed hourly packages below.
-                      </p>
-                      <a
-                        href="#hourly"
-                        style={{
-                          display: 'inline-block',
-                          padding: '0.9rem 2rem',
-                          borderRadius: '999px',
-                          fontWeight: 700,
-                          textDecoration: 'none',
-                          backgroundColor: 'var(--ink)',
-                          color: 'var(--cream)',
-                        }}
-                      >
-                        See hourly pricing ↓
-                      </a>
-                    </div>
-                  )}
+                    ))}
+
+                    {booth.showHourly && (
+                      <div style={{ marginBottom: '1.75rem' }}>
+                        <p
+                          style={{
+                            margin: '0 0 0.85rem',
+                            fontSize: '0.75rem',
+                            letterSpacing: '0.14em',
+                            textTransform: 'uppercase',
+                            color: 'rgba(37,70,65,0.55)',
+                            fontWeight: 700,
+                          }}
+                        >
+                          Or by the hour
+                        </p>
+
+                        <div
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1.2fr 1fr 1fr',
+                            gap: '0.4rem 0.75rem',
+                            fontSize: '0.85rem',
+                            alignItems: 'baseline',
+                          }}
+                        >
+                          <span style={{ color: 'rgba(37,70,65,0.5)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                            Duration
+                          </span>
+                          <span style={{ color: 'rgba(37,70,65,0.5)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', textAlign: 'right' }}>
+                            Digital
+                          </span>
+                          <span style={{ color: 'rgba(37,70,65,0.5)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', textAlign: 'right' }}>
+                            With prints
+                          </span>
+
+                          {hourly.map((row) => (
+                            <Fragment key={row.duration}>
+                              <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{row.duration}</span>
+                              <span style={{ textAlign: 'right', color: 'var(--ink)' }}>{row.digital}</span>
+                              <span style={{ textAlign: 'right', color: 'var(--clay)', fontWeight: 700 }}>
+                                {row.prints}
+                              </span>
+                            </Fragment>
+                          ))}
+                        </div>
+
+                        <p style={{ margin: '0.85rem 0 0', fontSize: '0.78rem', color: 'rgba(37,70,65,0.55)' }}>
+                          All print packages include unlimited prints.
+                        </p>
+                      </div>
+                    )}
+
+                    <Link
+                      href="/book"
+                      style={{
+                        display: 'inline-block',
+                        padding: '0.9rem 2rem',
+                        borderRadius: '999px',
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        backgroundColor: 'var(--ink)',
+                        color: 'var(--cream)',
+                      }}
+                    >
+                      Book the {booth.name} →
+                    </Link>
+                  </div>
                 </div>
               </article>
             );
@@ -298,178 +326,41 @@ export default function PackagesPage() {
         </div>
       </section>
 
-      {/* Hourly packages */}
-      <section id="hourly" style={{ padding: '5rem 2rem', backgroundColor: 'var(--paper)' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <span className="pill" style={{ backgroundColor: 'var(--blush)', color: 'var(--ink)' }}>
-              Staffed by an attendant
-            </span>
-            <h2 style={{ color: 'var(--ink)', marginTop: '1.5rem', fontSize: 'clamp(2rem, 5vw, 3.25rem)' }}>
-              Hourly packages
-            </h2>
-            <p style={{ fontSize: '1.05rem' }}>
-              Our attendant handles setup, guests and breakdown so you never think about it.
-            </p>
-          </div>
-
-          <div
-            style={{
-              backgroundColor: 'var(--cream)',
-              border: '1px solid var(--line)',
-              borderRadius: '1.5rem',
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1.4fr 1fr 1fr',
-                padding: '1.25rem 2rem',
-                backgroundColor: 'var(--ink)',
-                color: 'var(--cream)',
-                fontSize: '0.75rem',
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                fontWeight: 700,
-              }}
-            >
-              <span>Duration</span>
-              <span style={{ textAlign: 'right' }}>Digital only</span>
-              <span style={{ textAlign: 'right' }}>With prints</span>
-            </div>
-
-            {hourly.map((row, i) => (
-              <div
-                key={row.duration}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1.4fr 1fr 1fr',
-                  padding: '1.4rem 2rem',
-                  alignItems: 'center',
-                  borderTop: i === 0 ? 'none' : '1px solid var(--line)',
-                }}
-              >
-                <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{row.duration}</span>
-                <span
-                  style={{
-                    textAlign: 'right',
-                    fontFamily: "'Archivo Black', sans-serif",
-                    fontSize: '1.35rem',
-                    color: 'var(--ink)',
-                  }}
-                >
-                  {row.digital}
-                </span>
-                <span
-                  style={{
-                    textAlign: 'right',
-                    fontFamily: "'Archivo Black', sans-serif",
-                    fontSize: '1.35rem',
-                    color: 'var(--clay)',
-                  }}
-                >
-                  {row.prints}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <p
-            style={{
-              marginTop: '1.5rem',
-              fontSize: '0.85rem',
-              color: 'rgba(37,70,65,0.6)',
-              textAlign: 'center',
-            }}
-          >
-            *All print packages include unlimited prints.
+      {/* Closing CTA */}
+      <section style={{ padding: '0 2rem 6rem' }}>
+        <div
+          style={{
+            maxWidth: '1180px',
+            margin: '0 auto',
+            backgroundColor: 'var(--ink)',
+            borderRadius: '1.75rem',
+            padding: '3.5rem 2.5rem',
+            textAlign: 'center',
+          }}
+        >
+          <h2 style={{ color: 'var(--cream)', fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', marginBottom: '1rem' }}>
+            Not sure which booth?
+          </h2>
+          <p style={{ color: 'rgba(250,247,239,0.75)', marginBottom: '2rem', maxWidth: '520px', marginInline: 'auto' }}>
+            Send us your date and venue and we will tell you what fits — same-day answer, no pressure.
           </p>
-
-          {/* Split-coverage option — the one most weddings actually want. */}
-          <div
+          <Link
+            href="/book"
             style={{
-              marginTop: '2.5rem',
-              backgroundColor: 'var(--ink)',
-              color: 'var(--cream)',
-              borderRadius: '1.5rem',
-              padding: '2.5rem',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: '1.5rem',
-              alignItems: 'center',
+              display: 'inline-block',
+              padding: '1.15rem 2.5rem',
+              borderRadius: '999px',
+              fontWeight: 700,
+              textDecoration: 'none',
+              backgroundColor: 'var(--clay)',
+              color: 'var(--ink)',
             }}
           >
-            <div>
-              <span className="pill" style={{ backgroundColor: 'var(--clay)', color: 'var(--ink)' }}>
-                Best for weddings
-              </span>
-              <h3 style={{ color: 'var(--cream)', margin: '1.25rem 0 0.75rem', fontSize: '1.75rem' }}>
-                Completely Captured
-              </h3>
-              <p style={{ color: 'rgba(250,247,239,0.8)', margin: 0, fontSize: '0.95rem' }}>
-                1.5 hrs of cocktail hour plus 3 hrs of reception with the Mod Booth. Splitting the
-                coverage across the night is why our couples say there was never a line.
-              </p>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <span
-                style={{
-                  fontFamily: "'Archivo Black', sans-serif",
-                  fontSize: '3rem',
-                  color: 'var(--clay)',
-                  lineHeight: 1,
-                  display: 'block',
-                }}
-              >
-                $1,200
-              </span>
-              <p
-                style={{
-                  color: 'rgba(250,247,239,0.7)',
-                  fontSize: '0.8rem',
-                  letterSpacing: '0.14em',
-                  textTransform: 'uppercase',
-                  margin: '0.5rem 0 1.5rem',
-                }}
-              >
-                + tax · 4.5 hrs total
-              </p>
-              <Link
-                href="/book"
-                style={{
-                  display: 'inline-block',
-                  padding: '0.9rem 2rem',
-                  borderRadius: '999px',
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  backgroundColor: 'var(--clay)',
-                  color: 'var(--ink)',
-                }}
-              >
-                Book Completely Captured →
-              </Link>
-            </div>
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-            <Link
-              href="/book"
-              style={{
-                display: 'inline-block',
-                padding: '1.15rem 2.5rem',
-                borderRadius: '999px',
-                fontWeight: 700,
-                textDecoration: 'none',
-                backgroundColor: 'var(--clay)',
-                color: 'var(--ink)',
-              }}
-            >
-              Check Your Date →
-            </Link>
-          </div>
+            Check Your Date →
+          </Link>
         </div>
       </section>
+
 
       <SiteFooter />
     </main>
