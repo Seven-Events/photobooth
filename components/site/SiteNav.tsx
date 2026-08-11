@@ -24,47 +24,10 @@ export default function SiteNav() {
         borderBottom: '1px solid rgba(250, 247, 239, 0.1)',
       }}
     >
-      <div
-        className="site-nav-bar"
-        style={{
-          maxWidth: '1280px',
-          margin: '0 auto',
-          padding: '1.75rem 2rem',
-        }}
-      >
-        <Link
-          href="/"
-          style={{
-            color: 'var(--cream)',
-            textDecoration: 'none',
-            display: 'flex',
-            flexDirection: 'column',
-            lineHeight: 1,
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "'Archivo Black', sans-serif",
-              fontSize: '1.5rem',
-              letterSpacing: '-0.02em',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            Seven Events
-          </span>
-          <span
-            style={{
-              fontSize: '0.65rem',
-              letterSpacing: '0.28em',
-              textTransform: 'uppercase',
-              color: 'var(--clay)',
-              marginTop: '0.35rem',
-              fontWeight: 600,
-            }}
-          >
-            Photobooth Co.
-          </span>
+      <div className="site-nav-bar">
+        <Link href="/" className="site-nav-logo">
+          <span className="site-nav-logo__name">Seven Events</span>
+          <span className="site-nav-logo__sub">Photobooth Co.</span>
         </Link>
 
         <nav className="site-nav-links">
@@ -83,19 +46,7 @@ export default function SiteNav() {
           ))}
         </nav>
 
-        <Link
-          href="/book"
-          style={{
-            backgroundColor: 'var(--clay)',
-            color: 'var(--ink)',
-            padding: '0.9rem 1.75rem',
-            borderRadius: '999px',
-            fontWeight: 700,
-            fontSize: '0.9rem',
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-          }}
-        >
+        <Link href="/book" className="site-nav-cta">
           Book Your Date
         </Link>
       </div>

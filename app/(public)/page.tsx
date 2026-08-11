@@ -171,7 +171,9 @@ export default function Home() {
 
           <h1
             style={{
-              fontSize: 'clamp(2.75rem, 8vw, 6rem)',
+              // Floor is set by the longest word: at anything above ~8vw
+              // "UNFORGETTABLE" overflows a 375px screen and gets clipped.
+              fontSize: 'clamp(1.75rem, 8vw, 6rem)',
               color: 'var(--ink)',
               margin: '2rem 0 1.5rem',
             }}

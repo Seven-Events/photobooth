@@ -141,27 +141,10 @@ export default function PackagesPage() {
             return (
               <article
                 key={booth.name}
-                style={{
-                  backgroundColor: 'var(--paper)',
-                  border: '1px solid var(--line)',
-                  borderRadius: '1.75rem',
-                  overflow: 'hidden',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                }}
+                className={reversed ? 'booth-card booth-card--reversed' : 'booth-card'}
               >
                 {/* Image panel */}
-                <div
-                  style={{
-                    backgroundColor: booth.panelBg,
-                    minHeight: '340px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '2.5rem',
-                    order: reversed ? 2 : 1,
-                  }}
-                >
+                <div className="booth-card__media" style={{ backgroundColor: booth.panelBg }}>
                   <BoothImage
                     src={`/booths/${booth.slug}.webp`}
                     alt={`${booth.name} photobooth`}
@@ -170,14 +153,7 @@ export default function PackagesPage() {
                 </div>
 
                 {/* Detail panel */}
-                <div
-                  style={{
-                    padding: '3rem 2.75rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    order: reversed ? 1 : 2,
-                  }}
-                >
+                <div className="booth-card__detail">
                   <div
                     style={{
                       backgroundColor: 'var(--sage)',
