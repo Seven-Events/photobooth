@@ -2,11 +2,13 @@ import Link from 'next/link';
 import SiteNav from '@/components/site/SiteNav';
 import SiteFooter from '@/components/site/SiteFooter';
 
+// Every figure here must be defensible. 100+ events since 2023 at ~120 guests
+// each is where the 12,000 comes from; 100 km free travel is the real policy.
 const stats = [
-  { value: '500+', label: 'Events captured' },
-  { value: '2,000+', label: 'Happy guests' },
-  { value: '10+', label: 'Years experience' },
-  { value: '4.9★', label: 'Average rating' },
+  { value: '100+', label: 'Events since 2023' },
+  { value: '12,000+', label: 'Guests entertained' },
+  { value: '100 km', label: 'Free travel radius' },
+  { value: '5.0★', label: 'On Google' },
 ];
 
 const booths = [
@@ -44,21 +46,39 @@ const steps = [
   { n: '03', title: 'We handle the rest', copy: 'Setup, attendant, prints, and a full digital gallery afterwards.' },
 ];
 
-const testimonials = [
+/**
+ * Real customer reviews only. Leave this empty rather than inventing quotes —
+ * the section below hides itself when there is nothing verified to show.
+ * Paste Google reviews here verbatim, with the reviewer's name as it appears
+ * publicly.
+ */
+const testimonials: { name: string; event: string; text: string }[] = [];
+
+/** What actually removes hesitation at the point of booking. */
+const included = [
   {
-    name: 'Sarah & John',
-    event: 'Wedding',
-    text: 'Our guests could not stop talking about the photobooth. It was the highlight of the reception.',
+    title: 'No surprise travel fees',
+    copy: 'Free travel up to 100 km from Omemee — most of Kawartha Lakes, PEC, Belleville and Durham is covered.',
   },
   {
-    name: 'Emily Chen',
-    event: 'Corporate Event',
-    text: 'Professional, fun, and memorable. Our team loved it and the photos were incredible.',
+    title: 'Unlimited sessions, always',
+    copy: 'Never a per-photo cap. Every guest can go again as many times as they want.',
   },
   {
-    name: 'The Martinez Family',
-    event: 'Birthday Party',
-    text: 'The kids had such a blast. The props and instant prints were perfect.',
+    title: 'Setup and breakdown included',
+    copy: 'We arrive early, set up around your timeline, and pack down without interrupting the party.',
+  },
+  {
+    title: 'Photos land instantly',
+    copy: 'A live gallery guests can text or email to themselves before they have left the booth.',
+  },
+  {
+    title: 'Your branding on every print',
+    copy: 'A personalised template designed around your names, colours or company logo.',
+  },
+  {
+    title: 'Same-day date check',
+    copy: 'Send us your date and we confirm availability the same day — no waiting on a quote.',
   },
 ];
 
@@ -400,8 +420,64 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* What's included — the objections people actually have before booking */}
       <section style={{ padding: '5rem 2rem', backgroundColor: 'var(--blush)' }}>
+        <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3.5rem', maxWidth: '640px', marginInline: 'auto' }}>
+            <span className="pill" style={{ backgroundColor: 'var(--paper)', color: 'var(--ink)' }}>
+              No surprises
+            </span>
+            <h2
+              style={{
+                color: 'var(--ink)',
+                marginTop: '1.5rem',
+                fontSize: 'clamp(2rem, 5vw, 3.25rem)',
+              }}
+            >
+              What every booking includes
+            </h2>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '1.5rem',
+            }}
+          >
+            {included.map((item) => (
+              <div
+                key={item.title}
+                style={{
+                  backgroundColor: 'var(--paper)',
+                  borderRadius: '1.5rem',
+                  padding: '2.25rem',
+                  border: '1px solid var(--line)',
+                }}
+              >
+                <span
+                  aria-hidden
+                  style={{
+                    display: 'block',
+                    color: 'var(--clay)',
+                    fontSize: '1.5rem',
+                    lineHeight: 1,
+                    marginBottom: '1rem',
+                  }}
+                >
+                  ✓
+                </span>
+                <h4 style={{ color: 'var(--ink)', fontSize: '1.1rem' }}>{item.title}</h4>
+                <p style={{ margin: 0, fontSize: '0.95rem' }}>{item.copy}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Reviews — renders only when there are real ones to show */}
+      {testimonials.length > 0 && (
+      <section style={{ padding: '5rem 2rem' }}>
         <div style={{ maxWidth: '1180px', margin: '0 auto' }}>
           <h2
             style={{
@@ -459,6 +535,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Service areas */}
       <section style={{ padding: '5rem 2rem' }}>
