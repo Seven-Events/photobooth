@@ -127,7 +127,7 @@ export default function DurhamPage() {
         </div>
       </section>
 
-      <section style={{ backgroundColor: 'var(--blush)', padding: '2rem', borderRadius: '0.5rem', marginY: '2rem' }} className="max-w-4xl mx-auto my-8">
+      <section style={{ backgroundColor: 'var(--blush)', padding: '2rem', borderRadius: '0.5rem', margin: '2rem auto' }} className="max-w-4xl mx-auto">
         <p style={{ color: 'var(--ink)', fontWeight: 600, textAlign: 'center' }}>
           Serving all of Durham Region including: Ajax • Pickering • Whitby • Oshawa • Bowmanville • Courtice • Port Perry • Uxbridge • Stouffville • Lindsay and surrounding areas
         </p>
