@@ -26,7 +26,7 @@ const booths = [
     name: 'Mod Booth',
     blurb: 'Our full-service booth, staffed by an onsite attendant.',
     img: '/booths/mod-booth.webp',
-    panelBg: '#e1dfde',
+    panelBg: '#ede3db',
   },
 ];
 

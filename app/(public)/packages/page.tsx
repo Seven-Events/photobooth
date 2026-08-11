@@ -69,7 +69,7 @@ const booths: Booth[] = [
   {
     name: 'Mod Booth',
     slug: 'mod-booth',
-    panelBg: '#e1dfde',
+    panelBg: '#ede3db',
     tagline: 'Our full-service booth with an onsite attendant.',
     features: [
       'Choice of premium backdrop',
