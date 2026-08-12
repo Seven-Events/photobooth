@@ -29,7 +29,7 @@ export default function BookingsPage() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 style={{ fontFamily: 'Fraunces', fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+            <h1 style={{ fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
               Bookings
             </h1>
             <p style={{ color: 'var(--ink)' }}>Manage all photobooth bookings</p>

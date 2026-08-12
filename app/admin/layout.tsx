@@ -12,7 +12,7 @@ export default async function AdminLayout({
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       {/* Sidebar */}
       <aside className="sidebar" style={{ width: '280px', backgroundColor: 'var(--ink)', color: 'var(--cream)', padding: '2rem' }}>
-        <Link href="/" style={{ fontFamily: 'Fraunces', fontSize: '1.25rem', fontWeight: 600, color: 'var(--cream)', display: 'block', marginBottom: '2rem', textDecoration: 'none' }}>
+        <Link href="/" style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--cream)', display: 'block', marginBottom: '2rem', textDecoration: 'none' }}>
           Seven Events Admin
         </Link>
 

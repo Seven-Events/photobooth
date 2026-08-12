@@ -15,7 +15,7 @@ export default function BellevillePage() {
       <SiteNav />
 
       <section className="px-4 py-16 text-center max-w-4xl mx-auto">
-        <h1 style={{ fontSize: '3rem', color: 'var(--ink)' }} className="mb-6">
+        <h1 style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)', color: 'var(--ink)' }} className="mb-6">
           Belleville Photobooth
         </h1>
         <h2 style={{ fontSize: '1.5rem', color: 'var(--clay)', marginBottom: '1rem' }}>
@@ -29,9 +29,9 @@ export default function BellevillePage() {
         </Link>
       </section>
 
-      <section style={{ backgroundColor: 'var(--paper)', padding: '3rem' }} className="my-12">
+      <section style={{ backgroundColor: 'var(--paper)', padding: 'clamp(1.75rem, 5vw, 3rem)' }} className="my-12">
         <div className="max-w-4xl mx-auto">
-          <h3 style={{ fontSize: '2rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
+          <h3 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
             Why Belleville Events Choose Seven Events
           </h3>
 
@@ -94,7 +94,7 @@ export default function BellevillePage() {
       </section>
 
       <section className="px-4 py-16 max-w-4xl mx-auto">
-        <h3 style={{ fontSize: '2rem', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
+        <h3 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', color: 'var(--ink)', textAlign: 'center', marginBottom: '2rem' }}>
           Easy & Enjoyable
         </h3>
 
@@ -119,9 +119,9 @@ export default function BellevillePage() {
         </div>
       </section>
 
-      <section id="book" style={{ backgroundColor: 'var(--paper)', padding: '3rem' }} className="my-12">
+      <section id="book" style={{ backgroundColor: 'var(--paper)', padding: 'clamp(1.75rem, 5vw, 3rem)' }} className="my-12">
         <div className="max-w-4xl mx-auto text-center">
-          <h3 style={{ fontSize: '2rem', color: 'var(--ink)', marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', color: 'var(--ink)', marginBottom: '1rem' }}>
             Ready to Book Your Belleville Event?
           </h3>
           <p style={{ color: 'var(--ink)', marginBottom: '2rem' }}>

@@ -1,8 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Archivo+Black&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind v4 entry point. The old v3 `@tailwind base/components/utilities`
+   directives are silently ignored by v4, which is why no utility class worked
+   anywhere on the site. */
+@import "tailwindcss";
 
 :root {
   --ink: #254641;
@@ -17,11 +18,9 @@
   --ok: #4A7A5E;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* No universal margin/padding reset here: it would sit after the Tailwind
+   import and beat every spacing utility. Tailwind v4's preflight already
+   zeroes margins and sets border-box globally. */
 
 html {
   scroll-behavior: smooth;
@@ -330,6 +329,64 @@ button, input, select, textarea {
 .button-secondary:hover {
   background-color: var(--clay);
   color: var(--ink);
+}
+
+.button-primary:disabled,
+.button-secondary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Form fields. Shared so every form — login, booking, add-ons — gets the
+   same look and the same visible focus ring. */
+.field-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+
+.field {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field::placeholder {
+  color: rgba(37, 70, 65, 0.4);
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--clay);
+  box-shadow: 0 0 0 3px rgba(229, 139, 130, 0.25);
+}
+
+.field:disabled {
+  background-color: var(--blush);
+  cursor: not-allowed;
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Keyboard users must always be able to see where they are. */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 /* Responsive */

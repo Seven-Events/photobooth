@@ -16,7 +16,7 @@ export default function BackdropsPage() {
     <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 style={{ fontFamily: 'Fraunces', fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
             Backdrop Options
           </h1>
           <p style={{ color: 'var(--ink)' }}>Choose your favorite backdrop for your event</p>
@@ -55,7 +55,7 @@ export default function BackdropsPage() {
                   <p style={{ fontSize: '0.875rem' }}>Backdrop Preview</p>
                 </div>
               </div>
-              <h3 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+              <h3 style={{ color: 'var(--ink)', marginBottom: '0.5rem' }}>
                 {backdrop.name}
               </h3>
               <p style={{ color: 'var(--ink)', fontSize: '0.875rem', marginBottom: '1rem' }}>

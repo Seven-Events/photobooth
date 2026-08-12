@@ -35,7 +35,7 @@ export default function TemplatesPage() {
     <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 style={{ fontFamily: 'Fraunces', fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
             Design Your Photo Templates
           </h1>
           <p style={{ color: 'var(--ink)' }}>Create custom templates for your event photos</p>
@@ -56,7 +56,7 @@ export default function TemplatesPage() {
 
         {/* Info Section */}
         <div style={{ backgroundColor: 'var(--paper)', padding: '2rem', borderRadius: '0.5rem', marginBottom: '2rem', borderLeft: '4px solid var(--clay)' }}>
-          <h3 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+          <h3 style={{ color: 'var(--ink)', marginBottom: '0.5rem' }}>
             💡 Customization Tips
           </h3>
           <ul style={{ color: 'var(--ink)', marginLeft: '1.5rem', lineHeight: '1.8' }}>
@@ -87,7 +87,7 @@ export default function TemplatesPage() {
                   <p style={{ fontSize: '0.875rem' }}>Template Design</p>
                 </div>
               </div>
-              <h3 style={{ fontFamily: 'Fraunces', color: 'var(--ink)', marginBottom: '1rem' }}>
+              <h3 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 {template.name}
               </h3>
               <a
@@ -105,7 +105,7 @@ export default function TemplatesPage() {
 
         {/* Call to Action */}
         <div style={{ textAlign: 'center', marginTop: '3rem', padding: '2rem', backgroundColor: 'var(--paper)', borderRadius: '0.5rem' }}>
-          <h3 style={{ fontFamily: 'Fraunces', fontSize: '1.5rem', color: 'var(--ink)', marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '1.5rem', color: 'var(--ink)', marginBottom: '1rem' }}>
             Need Help?
           </h3>
           <p style={{ color: 'var(--ink)', marginBottom: '1rem' }}>

@@ -32,7 +32,7 @@ export default function ClientsPage() {
     <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 style={{ fontFamily: 'Fraunces', fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
             Clients
           </h1>
           <p style={{ color: 'var(--ink)' }}>Manage your photobooth clients</p>

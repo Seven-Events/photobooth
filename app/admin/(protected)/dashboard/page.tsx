@@ -68,7 +68,7 @@ export default function AdminDashboard() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 style={{ fontFamily: 'Fraunces', fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
             Admin Dashboard
           </h1>
           <p style={{ color: 'var(--ink)' }}>Manage your photobooth business</p>
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
                 </h3>
                 <span style={{ fontSize: '1.5rem' }}>{card.icon}</span>
               </div>
-              <p style={{ fontFamily: 'Fraunces', fontSize: '2rem', color: card.color, fontWeight: 600 }}>
+              <p style={{ fontSize: '2rem', color: card.color, fontWeight: 600 }}>
                 {loading ? '...' : card.value}
               </p>
             </div>
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="card">
-            <h3 style={{ fontFamily: 'Fraunces', fontSize: '1.25rem', color: 'var(--ink)', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--ink)', marginBottom: '1rem' }}>
               Quick Actions
             </h3>
             <div className="space-y-3">
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="card">
-            <h3 style={{ fontFamily: 'Fraunces', fontSize: '1.25rem', color: 'var(--ink)', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--ink)', marginBottom: '1rem' }}>
               Business Stats
             </h3>
             <div style={{ color: 'var(--ink)' }}>
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
         {/* Recent Bookings */}
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ fontFamily: 'Fraunces', fontSize: '1.25rem', color: 'var(--ink)' }}>
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--ink)' }}>
               Recent Bookings
             </h3>
             <a href="/admin/bookings" style={{ color: 'var(--clay)', textDecoration: 'none', fontWeight: 600 }}>

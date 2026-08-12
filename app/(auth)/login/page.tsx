@@ -37,47 +37,44 @@ export default function LoginPage() {
   return (
     <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen flex items-center justify-center p-4">
       <div className="card max-w-md w-full">
-        <h1 style={{ fontFamily: 'Fraunces', fontSize: '2rem', color: 'var(--ink)', marginBottom: '2rem', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '2rem', color: 'var(--ink)', marginBottom: '2rem', textAlign: 'center' }}>
           Welcome Back
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label style={{ color: 'var(--ink)' }} className="block font-semibold mb-2">
+            <label className="field-label">
               Email
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border"
-              style={{ borderColor: 'var(--line)' }}
+              className="field"
               required
             />
           </div>
 
           <div>
-            <label style={{ color: 'var(--ink)' }} className="block font-semibold mb-2">
+            <label className="field-label">
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border"
-              style={{ borderColor: 'var(--line)' }}
+              className="field"
               required
             />
           </div>
 
-          {error && <p style={{ color: 'var(--danger)' }} className="text-sm">{error}</p>}
+          {error && (
+            <p className="field-error" role="alert">
+              {error}
+            </p>
+          )}
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="button-primary w-full"
-            style={{ opacity: isLoading ? 0.6 : 1 }}
-          >
+          <button type="submit" disabled={isLoading} className="button-primary w-full">
             {isLoading ? 'Logging in...' : 'Log In'}
           </button>
         </form>

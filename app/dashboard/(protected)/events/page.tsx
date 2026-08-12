@@ -51,7 +51,7 @@ export default function EventsPage() {
     <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 style={{ fontFamily: 'Fraunces', fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+          <h1 style={{ fontSize: '2.5rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
             My Events
           </h1>
           <p style={{ color: 'var(--ink)' }}>Manage your photobooth bookings and design custom templates</p>
@@ -92,7 +92,7 @@ export default function EventsPage() {
                 <div className="card hover:shadow-lg transition-shadow cursor-pointer">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 style={{ fontFamily: 'Fraunces', fontSize: '1.25rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+                      <h3 style={{ fontSize: '1.25rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
                         {booking.lines?.[0]?.product?.name || 'Photobooth Booking'}
                       </h3>
                       <p style={{ color: 'var(--clay)', fontWeight: 600 }}>
