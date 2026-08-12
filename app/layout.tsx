@@ -17,7 +17,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" />
-        <script async src="https://www.booqable.com/embed.js"></script>
       </head>
       <body>{children}</body>
     </html>

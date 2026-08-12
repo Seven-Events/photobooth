@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import SiteNav from '@/components/site/SiteNav';
 import SiteFooter from '@/components/site/SiteFooter';
+import BookingForm from '@/components/booking/BookingForm';
 
 export const metadata: Metadata = {
   title: 'Book Your Photobooth | Seven Events',
@@ -27,16 +28,15 @@ export default function BookPage() {
             Book your photobooth
           </h1>
           <p style={{ fontSize: '1.15rem' }}>
-            Pick your package and date below. We confirm every booking by email within 24 hours.
+            Pick your booth and date below, then pay a deposit to hold it. We confirm every booking
+            by email within 24 hours.
           </p>
         </div>
       </section>
 
       <section style={{ padding: '0 2rem 5rem' }}>
-        <div style={{ maxWidth: '1180px', margin: '0 auto' }} className="space-y-8">
-          <div className="booqable-product" data-id="snap-booth"></div>
-          <div className="booqable-product" data-id="mod-booth"></div>
-          <div className="booqable-product" data-id="oak-booth"></div>
+        <div style={{ maxWidth: '780px', margin: '0 auto' }}>
+          <BookingForm />
         </div>
       </section>
 

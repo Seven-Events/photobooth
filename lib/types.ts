@@ -1,6 +1,15 @@
+import type { BoothId } from './packages';
+
 export type UserRole = 'client' | 'admin';
-export type PackageType = 'bronze' | 'silver' | 'gold';
-export type EventStatus = 'pending' | 'confirmed' | 'completed';
+
+/**
+ * awaiting_deposit — submitted, Stripe checkout not completed yet
+ * pending          — deposit paid (or taken offline), awaiting our confirmation
+ * confirmed        — date locked in
+ */
+export type EventStatus = 'awaiting_deposit' | 'pending' | 'confirmed' | 'completed' | 'cancelled';
+
+export type DepositStatus = 'unpaid' | 'paid' | 'refunded';
 
 export interface User {
   id: string;
@@ -18,7 +27,21 @@ export interface Event {
   event_date: string;
   event_time: string;
   event_title: string;
-  package_type: PackageType;
+  /** Which booth. */
+  booth_id: BoothId;
+  /** Rate id from lib/packages.ts, e.g. 'mod-completely-captured'. */
+  rate_id: string;
+  /** Add-on ids from lib/packages.ts. */
+  addon_ids: string[];
+  venue?: string;
+  guest_count?: number;
+  /** Cents, captured at booking time so later price changes do not rewrite history. */
+  subtotal_cents: number;
+  hst_cents: number;
+  total_cents: number;
+  deposit_cents: number;
+  deposit_status: DepositStatus;
+  stripe_session_id?: string;
   special_requests?: string;
   lumabooth_event_id?: string;
   status: EventStatus;
@@ -46,6 +69,8 @@ export interface PhotoTemplate {
   updated_at: string;
 }
 
+/** What the booking form posts. Prices are deliberately absent — the server
+ *  recalculates them from rate_id and addon_ids. */
 export interface BookingFormData {
   email: string;
   password: string;
@@ -54,18 +79,10 @@ export interface BookingFormData {
   event_date: string;
   event_time: string;
   event_title: string;
-  package_type: PackageType;
+  booth_id: BoothId;
+  rate_id: string;
+  addon_ids: string[];
+  venue?: string;
+  guest_count?: number;
   special_requests?: string;
-}
-
-export interface AdminBookingData {
-  full_name: string;
-  email: string;
-  phone: string;
-  event_date: string;
-  event_time: string;
-  event_title: string;
-  package_type: PackageType;
-  special_requests?: string;
-  lumabooth_event_id?: string;
 }

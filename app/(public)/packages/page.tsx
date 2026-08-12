@@ -4,95 +4,20 @@ import type { Metadata } from 'next';
 import SiteNav from '@/components/site/SiteNav';
 import SiteFooter from '@/components/site/SiteFooter';
 import BoothImage from '@/components/site/BoothImage';
+import {
+  booths,
+  formatPrice,
+  getRate,
+  hourlyTable,
+  ratesForBooth,
+  sharedFeatures,
+} from '@/lib/packages';
 
 export const metadata: Metadata = {
   title: 'Photobooth Packages & Pricing | Seven Events',
   description:
     'Snap, Oak and Mod photobooth packages from $600. Drop-off, hourly and the Completely Captured wedding package, with free travel up to 100 km from Omemee.',
 };
-
-type Rate = { label: string; price: string; note: string; badge?: string };
-
-type Booth = {
-  name: string;
-  slug: string;
-  /** Matches the flat backdrop baked into the product shot so it blends in. */
-  panelBg: string;
-  tagline: string;
-  /** Listed above the shared features, for anything unique to this booth. */
-  extraFeatures?: string[];
-  /** Fixed-price options. Empty means the booth is sold by the hour only. */
-  rates: Rate[];
-  /** Show the attendant-staffed hourly rates on this booth's card. */
-  showHourly?: boolean;
-};
-
-/**
- * True of every booth — kept in one place so the lists cannot drift apart.
- * All three carry a DSLR body and studio lighting.
- */
-const sharedFeatures = [
-  'Choice of premium backdrop',
-  'Studio-quality DSLR photos',
-  'Professional studio lighting',
-  'Photos, videos and boomerangs',
-  'Video guestbook',
-  'Personalized image template',
-  'Live gallery',
-  'Instant sharing via text & email',
-  'Free travel up to 100 km from Omemee',
-];
-
-const hourly = [
-  { duration: '2 hours', digital: '$600', prints: '$800' },
-  { duration: '3 hours', digital: '$750', prints: '$950' },
-  { duration: '4 hours', digital: '$900', prints: '$1100' },
-];
-
-const booths: Booth[] = [
-  {
-    name: 'Snap Booth',
-    slug: 'snap-booth',
-    panelBg: '#ede3db',
-    tagline: 'Sleek, compact and fully self-serve.',
-    rates: [
-      {
-        label: 'Digital Drop-off',
-        price: '$600',
-        note: 'Up to 14 hours unlimited use — no attendant, no prints',
-      },
-    ],
-  },
-  {
-    name: 'Oak Booth',
-    slug: 'oak-booth',
-    panelBg: '#ede3db',
-    tagline: 'Warm wood styling on a hardwood tripod.',
-    rates: [
-      {
-        label: 'Print Drop-off',
-        price: '$750',
-        note: 'Up to 14 hours unlimited use — no attendant, max 300 prints',
-      },
-    ],
-  },
-  {
-    name: 'Mod Booth',
-    slug: 'mod-booth',
-    panelBg: '#ede3db',
-    tagline: 'Our full-service booth, staffed by an onsite attendant.',
-    extraFeatures: ['Onsite attendant'],
-    rates: [
-      {
-        label: 'Completely Captured',
-        price: '$1,200',
-        note: '1.5 hrs cocktail hour plus 3 hrs reception — split coverage so there is never a line',
-        badge: 'Best for weddings',
-      },
-    ],
-    showHourly: true,
-  },
-];
 
 export default function PackagesPage() {
   return (
@@ -138,6 +63,11 @@ export default function PackagesPage() {
         <div style={{ maxWidth: '1180px', margin: '0 auto', display: 'grid', gap: '2.5rem' }}>
           {booths.map((booth, i) => {
             const reversed = i % 2 === 1;
+            // The hourly rates are listed in their own table below, so the
+            // headline is everything that is not part of that table.
+            const hourlyIds = new Set(hourlyTable.flatMap((r) => [r.digital, r.prints]));
+            const headlineRates = ratesForBooth(booth.id).filter((r) => !hourlyIds.has(r.id));
+            const showHourly = ratesForBooth(booth.id).some((r) => hourlyIds.has(r.id));
             return (
               <article
                 key={booth.name}
@@ -198,8 +128,8 @@ export default function PackagesPage() {
                   </ul>
 
                   <div style={{ marginTop: '2rem', paddingTop: '1.75rem', borderTop: '1px solid var(--line)' }}>
-                    {booth.rates.map((rate) => (
-                      <div key={rate.label} style={{ marginBottom: '1.5rem' }}>
+                    {headlineRates.map((rate) => (
+                      <div key={rate.id} style={{ marginBottom: '1.5rem' }}>
                         {rate.badge && (
                           <span
                             className="pill"
@@ -221,7 +151,7 @@ export default function PackagesPage() {
                               color: 'var(--clay)',
                             }}
                           >
-                            {rate.price}
+                            {formatPrice(rate.priceCents)}
                           </strong>{' '}
                           <span
                             style={{
@@ -239,7 +169,7 @@ export default function PackagesPage() {
                       </div>
                     ))}
 
-                    {booth.showHourly && (
+                    {showHourly && (
                       <div style={{ marginBottom: '1.75rem' }}>
                         <p
                           style={{
@@ -273,12 +203,14 @@ export default function PackagesPage() {
                             With prints
                           </span>
 
-                          {hourly.map((row) => (
+                          {hourlyTable.map((row) => (
                             <Fragment key={row.duration}>
                               <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{row.duration}</span>
-                              <span style={{ textAlign: 'right', color: 'var(--ink)' }}>{row.digital}</span>
+                              <span style={{ textAlign: 'right', color: 'var(--ink)' }}>
+                                {formatPrice(getRate(row.digital)!.priceCents)}
+                              </span>
                               <span style={{ textAlign: 'right', color: 'var(--clay)', fontWeight: 700 }}>
-                                {row.prints}
+                                {formatPrice(getRate(row.prints)!.priceCents)}
                               </span>
                             </Fragment>
                           ))}
