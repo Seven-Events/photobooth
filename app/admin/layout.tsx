@@ -3,8 +3,10 @@ import { requireAdmin } from '@/lib/auth';
 
 const links = [
   { href: '/admin/dashboard', label: '📊 Dashboard' },
+  { href: '/admin/calendar', label: '🗓️ Calendar' },
   { href: '/admin/bookings', label: '📅 Bookings' },
   { href: '/admin/clients', label: '👥 Clients' },
+  { href: '/admin/team', label: '🔑 Team' },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

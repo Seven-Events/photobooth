@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { formatPrice, getRate } from '@/lib/packages';
 
 type Booking = {
@@ -64,13 +65,18 @@ export default function BookingsPage() {
   return (
     <main style={{ backgroundColor: 'var(--cream)' }} className="min-h-screen p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 style={{ fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', color: 'var(--ink)', marginBottom: '0.5rem' }}>
-            Bookings
-          </h1>
-          <p style={{ color: 'rgba(37,70,65,0.7)' }}>
-            {loading ? 'Loading…' : `${bookings.length} booking${bookings.length === 1 ? '' : 's'}`}
-          </p>
+        <div className="mb-8" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+          <div>
+            <h1 style={{ fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+              Bookings
+            </h1>
+            <p style={{ color: 'rgba(37,70,65,0.7)', margin: 0 }}>
+              {loading ? 'Loading…' : `${bookings.length} booking${bookings.length === 1 ? '' : 's'}`}
+            </p>
+          </div>
+          <Link href="/admin/bookings/new" className="button-primary" style={{ textDecoration: 'none' }}>
+            ➕ Add booking
+          </Link>
         </div>
 
         {error && (
@@ -112,7 +118,9 @@ export default function BookingsPage() {
                     return (
                       <tr key={b.id} style={{ borderBottom: '1px solid var(--line)' }}>
                         <td style={td}>
-                          <strong>{b.users?.full_name ?? '—'}</strong>
+                          <Link href={`/admin/bookings/${b.id}`} style={{ fontWeight: 700, color: 'var(--ink)' }}>
+                            {b.users?.full_name ?? 'Open booking'}
+                          </Link>
                           <br />
                           <span style={{ fontSize: '0.82rem', color: 'rgba(37,70,65,0.6)' }}>
                             {b.users?.email}

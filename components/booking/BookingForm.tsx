@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   addons,
   booths,
@@ -35,9 +35,35 @@ export default function BookingForm() {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [availability, setAvailability] = useState<'unknown' | 'checking' | 'free' | 'taken'>('unknown');
 
   const boothRates = useMemo(() => ratesForBooth(boothId), [boothId]);
   const totals = useMemo(() => calculateTotals(rateId, addonIds), [rateId, addonIds]);
+
+  // Tell people the date is gone while they are still choosing, rather than
+  // after they have filled in the whole form. The server checks again on submit.
+  useEffect(() => {
+    if (!eventDate) {
+      setAvailability('unknown');
+      return;
+    }
+
+    let cancelled = false;
+    setAvailability('checking');
+
+    fetch(`/api/availability?date=${eventDate}&booth=${boothId}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (!cancelled) setAvailability(d.available ? 'free' : 'taken');
+      })
+      .catch(() => {
+        if (!cancelled) setAvailability('unknown');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [eventDate, boothId]);
 
   function chooseBooth(id: BoothId) {
     setBoothId(id);
@@ -279,6 +305,21 @@ export default function BookingForm() {
             <div>
               <label className="field-label" htmlFor="eventDate">Event date</label>
               <input id="eventDate" className="field" type="date" min={today()} value={eventDate} onChange={(e) => setEventDate(e.target.value)} required />
+              {availability === 'checking' && (
+                <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: '0.5rem 0 0' }}>
+                  Checking that date…
+                </p>
+              )}
+              {availability === 'free' && (
+                <p style={{ fontSize: '0.8rem', color: '#3c5a2b', fontWeight: 600, margin: '0.5rem 0 0' }}>
+                  ✓ Available
+                </p>
+              )}
+              {availability === 'taken' && (
+                <p role="alert" style={{ fontSize: '0.8rem', color: 'var(--danger)', fontWeight: 600, margin: '0.5rem 0 0' }}>
+                  Already booked for this booth. Try another date, or another booth.
+                </p>
+              )}
             </div>
             <div>
               <label className="field-label" htmlFor="eventTime">Start time</label>
@@ -390,11 +431,15 @@ export default function BookingForm() {
 
           <button
             type="submit"
-            disabled={submitting || !totals}
+            disabled={submitting || !totals || availability === 'taken'}
             className="button-primary"
             style={{ width: '100%' }}
           >
-            {submitting ? 'Setting up your booking…' : 'Continue to deposit →'}
+            {submitting
+              ? 'Setting up your booking…'
+              : availability === 'taken'
+                ? 'That date is taken'
+                : 'Continue to deposit →'}
           </button>
 
           <p style={{ color: 'rgba(250,247,239,0.6)', fontSize: '0.8rem', margin: '1rem 0 0', textAlign: 'center' }}>

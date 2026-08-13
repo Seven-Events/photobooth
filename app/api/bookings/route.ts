@@ -55,6 +55,20 @@ export async function POST(request: Request) {
 
     const adminClient = createAdminClient();
 
+    // Availability is checked here, not just in the browser — two people can
+    // reach checkout for the same Saturday within seconds of each other.
+    const { data: available, error: availabilityError } = await adminClient.rpc('is_booth_available', {
+      check_date: eventDate,
+      check_booth: boothId,
+    });
+
+    if (!availabilityError && available === false) {
+      return NextResponse.json(
+        { error: 'Sorry — that booth is already taken on that date. Please pick another date.' },
+        { status: 409 }
+      );
+    }
+
     // 1. Auth user
     const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
       email,
