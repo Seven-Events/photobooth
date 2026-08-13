@@ -88,39 +88,49 @@ My fiancé didn't even want a photo booth, but he admits with joy that Seven Eve
   },
 ];
 
-/** What actually removes hesitation at the point of booking. */
+/**
+ * What actually removes hesitation at the point of booking.
+ *
+ * Every claim here must be true of every package. Print counts differ by
+ * package and two booths are self-serve, so anything about prints or an
+ * attendant has to be worded carefully or left out.
+ */
 const included = [
   {
     title: 'A real camera, not a tablet',
-    copy: 'Every booth runs a high-quality DSLR with professional studio lighting — the difference shows on the print.',
+    copy: 'Every booth runs a high-quality DSLR with professional studio lighting — the difference shows in every shot.',
   },
   {
     title: 'No surprise travel fees',
     copy: 'Free travel up to 100 km from Omemee — most of Kawartha Lakes, PEC, Belleville and Durham is covered.',
   },
   {
-    title: 'Unlimited sessions, always',
-    copy: 'Never a per-photo cap. Every guest can go again as many times as they want.',
+    title: 'Unlimited photos, always',
+    copy: 'Never a cap on how many times guests can jump in. How many prints you get depends on the package.',
   },
   {
     title: 'Setup and breakdown included',
-    copy: 'We arrive early, set up around your timeline, and pack down without interrupting the party.',
+    copy: 'We arrive 45 minutes before your start time and pack down without interrupting the party. Need us in earlier? That can be added on.',
   },
   {
     title: 'Photos land instantly',
     copy: 'A live gallery guests can text or email to themselves before they have left the booth.',
   },
   {
-    title: 'Your branding on every print',
-    copy: 'A personalised template designed around your names, colours or company logo.',
+    title: 'Your branding on every capture',
+    copy: 'Your names, colours or company logo on every photo we take — printed or digital.',
+  },
+  {
+    title: 'Design your own template',
+    copy: 'Build it yourself in Canva from your dashboard, or send us your design and we will match it exactly.',
+  },
+  {
+    title: 'Book online in minutes',
+    copy: 'Pick your booth, date and package on the site and hold it with a deposit. No back-and-forth required.',
   },
   {
     title: 'Same-day date check',
     copy: 'Send us your date and we confirm availability the same day — no waiting on a quote.',
-  },
-  {
-    title: 'Prints set aside for you',
-    copy: 'Our attendant keeps a selection of the night’s prints back for you, so the hosts are not the ones left without any.',
   },
 ];
 
@@ -304,7 +314,7 @@ export default function Home() {
               Three booths, one obsession
             </h2>
             <p style={{ fontSize: '1.1rem' }}>
-              Every setup includes a premium backdrop, unlimited sessions, a live gallery and free
+              Every setup includes a premium backdrop, unlimited photos, a live gallery and free
               travel up to 100&nbsp;km from Omemee.
             </p>
           </div>

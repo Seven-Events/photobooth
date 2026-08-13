@@ -9,15 +9,51 @@ export const metadata: Metadata = {
     'Answers to common photobooth rental questions: rental length, backdrops, prints, digital sharing and booking lead time.',
 };
 
+// Keep these honest and specific to the real packages. Two of the three booths
+// are self-serve drop-offs with no attendant, and only some packages include
+// prints — blanket "every package includes…" answers are how this page ends up
+// promising things we do not sell.
 const faqs = [
-  { q: 'How long does the photobooth rental last?', a: 'Our packages range from 2 to 8 hours. We also offer hourly add-ons for extended events.' },
-  { q: 'Can I customize the backdrop?', a: 'Absolutely. We offer custom backdrop designs tailored to your event theme and branding.' },
-  { q: 'How many guests can use the photobooth?', a: 'All our packages support unlimited guests and unlimited sessions.' },
-  { q: 'Do you provide instant prints?', a: 'Yes. Guests receive instant printed photos from every session.' },
-  { q: 'Can guests share photos digitally?', a: 'Yes, they can share directly to social media or receive digital copies by email.' },
-  { q: 'What if my event is outside your service area?', a: 'Get in touch to discuss custom arrangements. We can often accommodate travel requests.' },
-  { q: 'How far in advance should I book?', a: 'We recommend booking at least 2 to 4 weeks in advance for the best availability.' },
-  { q: 'Is a professional attendant included?', a: 'Yes, every package includes an attendant who runs the booth for the full rental.' },
+  {
+    q: 'How long do we get the booth for?',
+    a: 'The Snap and Oak drop-off packages give you up to 14 hours of unlimited use. Attendant-staffed packages run 2, 3 or 4 hours, and Completely Captured covers 1.5 hours of cocktail hour plus 3 hours of the reception.',
+  },
+  {
+    q: 'Is an attendant included?',
+    a: 'On the Mod Booth, yes — an attendant runs it for the whole event. The Snap and Oak drop-off packages are self-serve: we deliver, set up and collect, and the booth is simple enough that guests run it themselves.',
+  },
+  {
+    q: 'Do we get prints?',
+    a: 'It depends on the package. The Oak print drop-off includes up to 300 prints, and attendant-staffed packages with prints are unlimited. The Snap digital drop-off is digital only — every photo goes straight to guests’ phones instead.',
+  },
+  {
+    q: 'How many guests can use it?',
+    a: 'As many as you like. There is never a cap on guests or on how many times someone jumps in — only print counts vary by package.',
+  },
+  {
+    q: 'Can guests get their photos on their phones?',
+    a: 'Yes. There is a live gallery guests can text or email to themselves before they have even left the booth, and you get a link to every photo afterwards.',
+  },
+  {
+    q: 'Can I customise the backdrop and the print template?',
+    a: 'Yes to both. Every package includes your choice of premium backdrop, and you can design your own photo template in Canva from your dashboard — or send us a design and we will match it exactly.',
+  },
+  {
+    q: 'When do you arrive?',
+    a: 'We arrive 45 minutes before your start time to set up, and pack down afterwards without interrupting the party. If you need us in earlier, that can be added on for an extra fee.',
+  },
+  {
+    q: 'Do you charge for travel?',
+    a: 'Not within 100 km of Omemee, which covers most of Kawartha Lakes, Prince Edward County, Belleville and Durham Region. Further afield, get in touch and we will quote it.',
+  },
+  {
+    q: 'How far in advance should I book?',
+    a: 'Two to four weeks is usually enough, but summer Saturdays go early. We hold one booking per booth per day, so the sooner you check your date the better.',
+  },
+  {
+    q: 'How does payment work?',
+    a: 'A deposit holds your date, and the balance is invoiced before the event. All prices are plus HST, and there is nothing else added at the end.',
+  },
 ];
 
 export default function FAQPage() {
