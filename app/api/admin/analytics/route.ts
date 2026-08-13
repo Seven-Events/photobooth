@@ -1,61 +1,73 @@
 import { createClient } from '@/lib/supabase/server';
-import { getBooqableBookings, getBooqableCustomers } from '@/lib/booqable';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 
+/**
+ * Admin headline numbers, computed from our events table.
+ *
+ * Previously read from Booqable, which meant every figure showed zero once
+ * bookings started saving to our own database.
+ */
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Not signed in' }, { status: 401 });
     }
 
-    // Check if user is admin
-    const { data: userData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
+    const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).maybeSingle();
 
-    if (userData?.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Not authorized' },
-        { status: 403 }
-      );
+    if (profile?.role !== 'admin') {
+      return NextResponse.json({ error: 'Not authorised' }, { status: 403 });
     }
 
-    // Fetch data from Booqable
-    const bookings = await getBooqableBookings();
-    const customers = await getBooqableCustomers();
+    const admin = createAdminClient();
 
-    // Calculate analytics
-    const now = new Date();
-    const upcomingEvents = bookings.filter(
-      (b: any) => new Date(b.starts_at) > now
-    ).length;
+    const { data: events, error } = await admin
+      .from('events')
+      .select('event_date, status, total_cents, deposit_cents, deposit_status, user_id');
 
-    const totalRevenue = bookings.reduce((sum: number, b: any) => {
-      return sum + (b.total_price || 0);
-    }, 0);
+    if (error) {
+      console.error('Error fetching analytics:', error);
+      return NextResponse.json({ error: 'Could not load analytics' }, { status: 500 });
+    }
+
+    const rows = events ?? [];
+    const today = new Date(new Date().toDateString());
+    const live = rows.filter((e) => e.status !== 'cancelled');
+
+    // Revenue counts money actually taken, not money hoped for: deposits that
+    // cleared, plus the full amount on bookings marked completed.
+    const depositsCollectedCents = live
+      .filter((e) => e.deposit_status === 'paid')
+      .reduce((sum, e) => sum + (e.deposit_cents ?? 0), 0);
+
+    const completedCents = live
+      .filter((e) => e.status === 'completed')
+      .reduce((sum, e) => sum + (e.total_cents ?? 0), 0);
+
+    const bookedValueCents = live.reduce((sum, e) => sum + (e.total_cents ?? 0), 0);
 
     return NextResponse.json(
       {
-        totalBookings: bookings.length,
-        totalCustomers: customers.length,
-        upcomingEvents,
-        revenue: totalRevenue,
+        totalBookings: live.length,
+        totalCustomers: new Set(live.map((e) => e.user_id)).size,
+        upcomingEvents: live.filter((e) => new Date(e.event_date + 'T00:00:00') >= today).length,
+        awaitingDeposit: rows.filter((e) => e.status === 'awaiting_deposit').length,
+        pendingConfirmation: rows.filter((e) => e.status === 'pending').length,
+        depositsCollectedCents,
+        completedCents,
+        bookedValueCents,
       },
       { status: 200 }
     );
   } catch (error) {
     console.error('Error fetching analytics:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

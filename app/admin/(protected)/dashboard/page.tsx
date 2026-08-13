@@ -1,12 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { formatPrice } from '@/lib/packages';
 
 interface Analytics {
   totalBookings: number;
   totalCustomers: number;
   upcomingEvents: number;
-  revenue: number;
+  awaitingDeposit: number;
+  pendingConfirmation: number;
+  depositsCollectedCents: number;
+  completedCents: number;
+  bookedValueCents: number;
 }
 
 export default function AdminDashboard() {
@@ -14,7 +19,11 @@ export default function AdminDashboard() {
     totalBookings: 0,
     totalCustomers: 0,
     upcomingEvents: 0,
-    revenue: 0,
+    awaitingDeposit: 0,
+    pendingConfirmation: 0,
+    depositsCollectedCents: 0,
+    completedCents: 0,
+    bookedValueCents: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -44,20 +53,22 @@ export default function AdminDashboard() {
       color: 'var(--clay)',
     },
     {
-      label: 'Total Customers',
-      value: analytics.totalCustomers,
-      icon: '👥',
-      color: 'var(--ink)',
-    },
-    {
       label: 'Upcoming Events',
       value: analytics.upcomingEvents,
       icon: '⏰',
       color: 'var(--ok)',
     },
     {
-      label: 'Revenue',
-      value: `$${analytics.revenue.toLocaleString()}`,
+      label: 'Needs Attention',
+      value: analytics.awaitingDeposit + analytics.pendingConfirmation,
+      icon: '⚠️',
+      color: 'var(--ink)',
+    },
+    {
+      // Money actually taken, not the value of everything booked — those are
+      // very different numbers and conflating them flatters the figures.
+      label: 'Deposits Collected',
+      value: formatPrice(analytics.depositsCollectedCents),
       icon: '💰',
       color: 'var(--clay)',
     },
@@ -98,10 +109,10 @@ export default function AdminDashboard() {
               Quick Actions
             </h3>
             <div className="space-y-3">
-              <a href="/admin/bookings/new" className="button-primary" style={{ display: 'block', textAlign: 'center', padding: '0.75rem' }}>
-                ➕ Create New Booking
+              <a href="/admin/bookings" className="button-primary" style={{ display: 'block', textAlign: 'center', padding: '0.75rem', textDecoration: 'none' }}>
+                📅 View All Bookings
               </a>
-              <a href="/admin/clients" className="button-secondary" style={{ display: 'block', textAlign: 'center', padding: '0.75rem' }}>
+              <a href="/admin/clients" className="button-secondary" style={{ display: 'block', textAlign: 'center', padding: '0.75rem', textDecoration: 'none' }}>
                 👥 Manage Clients
               </a>
             </div>
@@ -109,17 +120,26 @@ export default function AdminDashboard() {
 
           <div className="card">
             <h3 style={{ fontSize: '1.25rem', color: 'var(--ink)', marginBottom: '1rem' }}>
-              Business Stats
+              Money
             </h3>
             <div style={{ color: 'var(--ink)' }}>
               <p style={{ marginBottom: '0.5rem' }}>
-                <strong>This Month:</strong> {analytics.totalBookings} bookings
+                <strong>Booked value:</strong> {formatPrice(analytics.bookedValueCents)}{' '}
+                <span style={{ color: 'rgba(37,70,65,0.55)', fontSize: '0.85rem' }}>
+                  — everything on the books, incl. HST
+                </span>
               </p>
               <p style={{ marginBottom: '0.5rem' }}>
-                <strong>Conversion:</strong> {analytics.totalCustomers > 0 ? ((analytics.totalBookings / analytics.totalCustomers) * 100).toFixed(1) : 0}%
+                <strong>Deposits collected:</strong> {formatPrice(analytics.depositsCollectedCents)}
               </p>
-              <p>
-                <strong>Avg Value:</strong> ${analytics.revenue > 0 && analytics.totalBookings > 0 ? (analytics.revenue / analytics.totalBookings).toFixed(2) : 0}
+              <p style={{ marginBottom: '0.5rem' }}>
+                <strong>Completed events:</strong> {formatPrice(analytics.completedCents)}
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong>Average booking:</strong>{' '}
+                {analytics.totalBookings > 0
+                  ? formatPrice(Math.round(analytics.bookedValueCents / analytics.totalBookings))
+                  : formatPrice(0)}
               </p>
             </div>
           </div>
