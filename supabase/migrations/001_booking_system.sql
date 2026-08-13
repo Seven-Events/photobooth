@@ -64,6 +64,27 @@ create index if not exists events_stripe_session_idx on public.events (stripe_se
 -- booking, including their phone number and venue.
 -- ---------------------------------------------------------------------------
 
+-- The admin check has to live in a SECURITY DEFINER function.
+--
+-- Doing it inline as `exists (select 1 from public.users ...)` inside a policy
+-- ON public.users makes Postgres re-evaluate the same policy to answer the
+-- subquery, and it fails with "infinite recursion detected in policy". Running
+-- it as the function owner sidesteps RLS for that one lookup.
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from public.users
+    where id = auth.uid() and role = 'admin'
+  );
+$$;
+
+grant execute on function public.is_admin() to authenticated, anon;
+
 alter table public.events enable row level security;
 
 drop policy if exists "clients read own events" on public.events;
@@ -74,22 +95,12 @@ create policy "clients read own events"
 drop policy if exists "admins read all events" on public.events;
 create policy "admins read all events"
   on public.events for select
-  using (
-    exists (
-      select 1 from public.users u
-      where u.id = auth.uid() and u.role = 'admin'
-    )
-  );
+  using (public.is_admin());
 
 drop policy if exists "admins update events" on public.events;
 create policy "admins update events"
   on public.events for update
-  using (
-    exists (
-      select 1 from public.users u
-      where u.id = auth.uid() and u.role = 'admin'
-    )
-  );
+  using (public.is_admin());
 
 -- Bookings are created by the server using the service role key, which bypasses
 -- RLS. There is deliberately no public insert policy: a booking must go through
@@ -105,9 +116,4 @@ create policy "users read own profile"
 drop policy if exists "admins read all users" on public.users;
 create policy "admins read all users"
   on public.users for select
-  using (
-    exists (
-      select 1 from public.users u
-      where u.id = auth.uid() and u.role = 'admin'
-    )
-  );
+  using (public.is_admin());
