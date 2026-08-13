@@ -46,9 +46,16 @@ export default function SiteNav() {
           ))}
         </nav>
 
-        <Link href="/book" className="site-nav-cta">
-          Book Your Date
-        </Link>
+        <div className="site-nav-actions">
+          <Link href="/login" className="site-nav-login">
+            Log in
+          </Link>
+          <Link href="/book" className="site-nav-cta">
+            {/* Shortened on phones so the logo, Log in and this all fit one row. */}
+            <span className="site-nav-cta__full">Book Your Date</span>
+            <span className="site-nav-cta__compact">Book</span>
+          </Link>
+        </div>
       </div>
     </header>
   );
