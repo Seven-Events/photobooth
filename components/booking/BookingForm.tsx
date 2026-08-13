@@ -6,6 +6,7 @@ import {
   booths,
   calculateTotals,
   formatPrice,
+  groupAddons,
   ratesForBooth,
   type BoothId,
 } from '@/lib/packages';
@@ -74,6 +75,15 @@ export default function BookingForm() {
 
   function toggleAddon(id: string) {
     setAddonIds((prev) => (prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]));
+  }
+
+  /** Quantity is stored as repeated ids — see the note in lib/packages.ts. */
+  function setAddonQty(id: string, qty: number) {
+    setAddonIds((prev) => [...prev.filter((a) => a !== id), ...Array(Math.max(0, qty)).fill(id)]);
+  }
+
+  function addonQty(id: string) {
+    return addonIds.filter((a) => a === id).length;
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -254,38 +264,74 @@ export default function BookingForm() {
 
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             {addons.map((a) => {
-              const selected = addonIds.includes(a.id);
+              const qty = addonQty(a.id);
+              const selected = qty > 0;
+
+              const header = (
+                <span style={{ flex: 1 }}>
+                  <span style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 700, color: 'var(--ink)' }}>{a.label}</span>
+                    <span style={{ fontWeight: 700, color: 'var(--clay)', whiteSpace: 'nowrap' }}>
+                      + {formatPrice(a.priceCents)}
+                      {a.perUnit ? ` / ${a.perUnit}` : ''}
+                    </span>
+                  </span>
+                  <span style={{ display: 'block', fontSize: '0.85rem', color: 'rgba(37,70,65,0.65)', marginTop: '0.35rem' }}>
+                    {a.note}
+                  </span>
+                </span>
+              );
+
+              const boxStyle: React.CSSProperties = {
+                display: 'flex',
+                gap: '1rem',
+                alignItems: 'flex-start',
+                borderRadius: '0.85rem',
+                border: selected ? '2px solid var(--clay)' : '1px solid var(--line)',
+                backgroundColor: selected ? 'rgba(229,139,130,0.08)' : 'var(--cream)',
+                padding: '1rem 1.25rem',
+              };
+
+              // Per-unit add-ons get a quantity picker instead of a checkbox —
+              // "$75 / hour" is meaningless without a number of hours.
+              if (a.perUnit) {
+                return (
+                  <div key={a.id} style={{ ...boxStyle, flexWrap: 'wrap' }}>
+                    {header}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                      <label className="field-label" htmlFor={`qty-${a.id}`} style={{ margin: 0 }}>
+                        {a.perUnit}s
+                      </label>
+                      <select
+                        id={`qty-${a.id}`}
+                        className="field"
+                        style={{ width: 'auto', padding: '0.5rem 0.75rem' }}
+                        value={qty}
+                        onChange={(e) => setAddonQty(a.id, Number(e.target.value))}
+                      >
+                        {Array.from({ length: (a.maxUnits ?? 4) + 1 }).map((_, n) => (
+                          <option key={n} value={n}>{n}</option>
+                        ))}
+                      </select>
+                      {qty > 0 && (
+                        <span style={{ fontWeight: 700, color: 'var(--clay)', whiteSpace: 'nowrap' }}>
+                          {formatPrice(a.priceCents * qty)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+
               return (
-                <label
-                  key={a.id}
-                  style={{
-                    display: 'flex',
-                    gap: '1rem',
-                    alignItems: 'flex-start',
-                    cursor: 'pointer',
-                    borderRadius: '0.85rem',
-                    border: selected ? '2px solid var(--clay)' : '1px solid var(--line)',
-                    backgroundColor: selected ? 'rgba(229,139,130,0.08)' : 'var(--cream)',
-                    padding: '1rem 1.25rem',
-                  }}
-                >
+                <label key={a.id} style={{ ...boxStyle, cursor: 'pointer' }}>
                   <input
                     type="checkbox"
                     checked={selected}
                     onChange={() => toggleAddon(a.id)}
                     style={{ marginTop: '0.3rem', accentColor: 'var(--clay)' }}
                   />
-                  <span style={{ flex: 1 }}>
-                    <span style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                      <span style={{ fontWeight: 700, color: 'var(--ink)' }}>{a.label}</span>
-                      <span style={{ fontWeight: 700, color: 'var(--clay)', whiteSpace: 'nowrap' }}>
-                        + {formatPrice(a.priceCents)}
-                      </span>
-                    </span>
-                    <span style={{ display: 'block', fontSize: '0.85rem', color: 'rgba(37,70,65,0.65)', marginTop: '0.35rem' }}>
-                      {a.note}
-                    </span>
-                  </span>
+                  {header}
                 </label>
               );
             })}
@@ -395,8 +441,13 @@ export default function BookingForm() {
           {totals ? (
             <>
               <Row label={totals.rate.label} value={formatPrice(totals.rate.priceCents)} />
-              {totals.addons.map((a) => (
-                <Row key={a.id} label={a.label} value={'+ ' + formatPrice(a.priceCents)} muted />
+              {groupAddons(addonIds).map(({ addon, qty, totalCents }) => (
+                <Row
+                  key={addon.id}
+                  label={qty > 1 ? `${addon.label} × ${qty}` : addon.label}
+                  value={'+ ' + formatPrice(totalCents)}
+                  muted
+                />
               ))}
               <Row label="HST" value={formatPrice(totals.hstCents)} muted />
 

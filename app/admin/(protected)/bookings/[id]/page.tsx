@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { use } from 'react';
-import { addons as allAddons, formatPrice, getBooth, getRate } from '@/lib/packages';
+import { formatPrice, getBooth, getRate, groupAddons } from '@/lib/packages';
 
 type Booking = {
   id: string;
@@ -188,9 +188,9 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
 
   const rate = getRate(booking.rate_id);
   const booth = getBooth(booking.booth_id);
-  const chosenAddons = (booking.addon_ids ?? [])
-    .map((a) => allAddons.find((x) => x.id === a))
-    .filter(Boolean);
+  // Grouped, because quantity is stored as a repeated id.
+  const chosenAddons = groupAddons(booking.addon_ids ?? []);
+  const addonsTotalCents = chosenAddons.reduce((s, a) => s + a.totalCents, 0);
   const balance = booking.total_cents - booking.deposit_cents;
 
   return (
@@ -276,8 +276,15 @@ export default function BookingDetailPage({ params }: { params: Promise<{ id: st
 
           <section className="card">
             <h2 style={{ fontSize: '1.1rem', color: 'var(--ink)', marginBottom: '1rem' }}>Money</h2>
-            <Line label={rate?.label ?? booking.rate_id} value={formatPrice(booking.subtotal_cents - chosenAddons.reduce((s, a) => s + (a?.priceCents ?? 0), 0))} />
-            {chosenAddons.map((a) => a && <Line key={a.id} label={a.label} value={formatPrice(a.priceCents)} muted />)}
+            <Line label={rate?.label ?? booking.rate_id} value={formatPrice(booking.subtotal_cents - addonsTotalCents)} />
+            {chosenAddons.map(({ addon, qty, totalCents }) => (
+              <Line
+                key={addon.id}
+                label={qty > 1 ? `${addon.label} × ${qty}` : addon.label}
+                value={formatPrice(totalCents)}
+                muted
+              />
+            ))}
             <Line label="HST" value={formatPrice(booking.hst_cents)} muted />
             <div style={{ borderTop: '1px solid var(--line)', margin: '0.6rem 0', paddingTop: '0.6rem' }}>
               <Line label="Total" value={formatPrice(booking.total_cents)} bold />

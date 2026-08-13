@@ -37,6 +37,16 @@ export type Addon = {
   label: string;
   priceCents: number;
   note: string;
+  /**
+   * Set when the price is per unit rather than flat, e.g. 'hour'.
+   *
+   * Quantity is stored by repeating the id in the addon list — two hours of
+   * early setup is ['early-setup', 'early-setup']. That keeps the database
+   * column a plain text[] and means the price maths below needs no special
+   * case: summing the list already multiplies correctly.
+   */
+  perUnit?: string;
+  maxUnits?: number;
 };
 
 /** True of every booth. All three carry a DSLR body and studio lighting. */
@@ -116,10 +126,22 @@ export const hourlyTable = [
   { duration: '4 hours', digital: 'mod-4h-digital', prints: 'mod-4h-prints' },
 ];
 
+/**
+ * Only add-ons Seven Events actually sells.
+ *
+ * Three placeholders (extra hour, premium backdrop, guest book) were removed
+ * rather than left in — they were invented during the build and were never
+ * confirmed as real products. Add any genuine ones back here.
+ */
 export const addons: Addon[] = [
-  { id: 'extra-hour', label: 'Extra hour', priceCents: 15000, note: 'Added to any attendant-staffed package' },
-  { id: 'premium-backdrop', label: 'Premium backdrop', priceCents: 15000, note: 'Custom design built around your theme' },
-  { id: 'guest-book', label: 'Physical guest book', priceCents: 10000, note: 'Prints mounted with space for guest messages' },
+  {
+    id: 'early-setup',
+    label: 'Early setup',
+    priceCents: 7500,
+    note: 'We normally arrive 45 minutes before your start time. Add hours to come in earlier.',
+    perUnit: 'hour',
+    maxUnits: 6,
+  },
 ];
 
 /**
@@ -159,6 +181,23 @@ export function formatPrice(cents: number): string {
       maximumFractionDigits: 2,
     })
   );
+}
+
+/**
+ * Collapse a repeated add-on list into one row per add-on with a quantity,
+ * for display. ['early-setup','early-setup'] becomes 2 × Early setup.
+ */
+export function groupAddons(addonIds: string[]) {
+  const counts = new Map<string, number>();
+  for (const id of addonIds) counts.set(id, (counts.get(id) ?? 0) + 1);
+
+  return [...counts.entries()]
+    .map(([id, qty]) => {
+      const addon = addons.find((a) => a.id === id);
+      if (!addon) return null;
+      return { addon, qty, totalCents: addon.priceCents * qty };
+    })
+    .filter((x): x is { addon: Addon; qty: number; totalCents: number } => x !== null);
 }
 
 /**

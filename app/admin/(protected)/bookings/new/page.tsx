@@ -149,20 +149,48 @@ export default function NewBookingPage() {
 
             <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
               <legend className="field-label" style={{ padding: 0 }}>Add-ons</legend>
-              <div style={{ display: 'grid', gap: '0.5rem' }}>
-                {addons.map((a) => (
-                  <label key={a.id} style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', fontSize: '0.92rem', color: 'var(--ink)' }}>
-                    <input
-                      type="checkbox"
-                      checked={addonIds.includes(a.id)}
-                      style={{ accentColor: 'var(--clay)' }}
-                      onChange={() =>
-                        setAddonIds((prev) => prev.includes(a.id) ? prev.filter((x) => x !== a.id) : [...prev, a.id])
-                      }
-                    />
-                    {a.label} — {formatPrice(a.priceCents)}
-                  </label>
-                ))}
+              <div style={{ display: 'grid', gap: '0.6rem' }}>
+                {addons.map((a) => {
+                  const qty = addonIds.filter((x) => x === a.id).length;
+
+                  if (a.perUnit) {
+                    return (
+                      <div key={a.id} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', fontSize: '0.92rem', color: 'var(--ink)', flexWrap: 'wrap' }}>
+                        <select
+                          className="field"
+                          style={{ width: 'auto', padding: '0.4rem 0.6rem' }}
+                          value={qty}
+                          onChange={(e) => {
+                            const n = Number(e.target.value);
+                            setAddonIds((prev) => [...prev.filter((x) => x !== a.id), ...Array(n).fill(a.id)]);
+                          }}
+                        >
+                          {Array.from({ length: (a.maxUnits ?? 4) + 1 }).map((_, n) => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                        </select>
+                        {a.label} — {formatPrice(a.priceCents)} / {a.perUnit}
+                        {qty > 0 && (
+                          <strong style={{ color: 'var(--clay)' }}>{formatPrice(a.priceCents * qty)}</strong>
+                        )}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <label key={a.id} style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', fontSize: '0.92rem', color: 'var(--ink)' }}>
+                      <input
+                        type="checkbox"
+                        checked={qty > 0}
+                        style={{ accentColor: 'var(--clay)' }}
+                        onChange={() =>
+                          setAddonIds((prev) => prev.includes(a.id) ? prev.filter((x) => x !== a.id) : [...prev, a.id])
+                        }
+                      />
+                      {a.label} — {formatPrice(a.priceCents)}
+                    </label>
+                  );
+                })}
               </div>
             </fieldset>
 
