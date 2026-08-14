@@ -1,19 +1,21 @@
-import { createAdminClient } from '@/lib/supabase/admin';
-import { sendBookingConfirmationEmail } from '@/lib/email';
+import { confirmDeposit } from '@/lib/confirm-deposit';
 import { isStripeConfigured, stripe } from '@/lib/stripe';
 import { NextResponse } from 'next/server';
 
 /**
- * Stripe tells us a deposit succeeded here — not the browser redirect, which a
- * customer can close, refresh or fake. This is the only place a booking is
- * marked paid.
+ * Stripe's own notification that a deposit succeeded.
  *
- * Set the signing secret as STRIPE_WEBHOOK_SECRET and point the Stripe
- * dashboard at /api/stripe/webhook for the checkout.session.completed event.
+ * More reliable than the customer's return trip — it fires even if they close
+ * the tab — but optional: the success page verifies the session too, and
+ * confirmDeposit() is idempotent, so whichever arrives first wins and the
+ * other does nothing.
+ *
+ * To enable: set STRIPE_WEBHOOK_SECRET and point Stripe at /api/stripe/webhook
+ * for the checkout.session.completed event.
  */
 export async function POST(request: Request) {
   if (!isStripeConfigured() || !process.env.STRIPE_WEBHOOK_SECRET) {
-    return NextResponse.json({ error: 'Stripe is not configured' }, { status: 503 });
+    return NextResponse.json({ error: 'Stripe webhook is not configured' }, { status: 503 });
   }
 
   const signature = request.headers.get('stripe-signature');
@@ -54,36 +56,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   }
 
-  const admin = createAdminClient();
+  const result = await confirmDeposit(eventId);
 
-  const { data: booking, error } = await admin
-    .from('events')
-    .update({ deposit_status: 'paid', status: 'pending' })
-    .eq('id', eventId)
-    // Only move it forward once, so a replayed event does not resend the email.
-    .eq('deposit_status', 'unpaid')
-    .select('*, users(email, full_name)')
-    .maybeSingle();
-
-  if (error) {
-    console.error('Failed to mark deposit paid:', error);
+  if (result === 'failed') {
+    // A non-2xx makes Stripe retry, which is what we want for a transient
+    // database problem.
     return NextResponse.json({ error: 'Database update failed' }, { status: 500 });
   }
 
-  if (booking) {
-    const customer = booking.users as { email?: string; full_name?: string } | null;
-    if (customer?.email) {
-      await sendBookingConfirmationEmail({
-        email: customer.email,
-        name: customer.full_name || 'there',
-        eventDate: booking.event_date,
-        eventTime: booking.event_time,
-        packageLabel: booking.rate_id,
-        depositCents: booking.deposit_cents,
-        balanceCents: booking.total_cents - booking.deposit_cents,
-      });
-    }
-  }
-
-  return NextResponse.json({ received: true });
+  return NextResponse.json({ received: true, result });
 }

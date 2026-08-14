@@ -37,9 +37,14 @@ export async function GET() {
   const { error: notesTableError } = await gate.db.from('booking_notes').select('id').limit(1);
 
   const warnings: string[] = [];
+  const suggestions: string[] = [];
+
   if (checks.stripeSecretKey && !checks.stripeWebhookSecret) {
-    warnings.push(
-      'Stripe can take payments but nothing confirms them: STRIPE_WEBHOOK_SECRET is missing, so bookings will stay stuck on "awaiting deposit" even after a customer pays.'
+    // Not a blocker: the success page verifies the session with Stripe and
+    // confirms the deposit. The webhook only adds cover for the case where the
+    // customer pays and never returns to the site.
+    suggestions.push(
+      'Payments are confirmed when the customer returns to the site after paying. Adding STRIPE_WEBHOOK_SECRET would also catch the rarer case where they pay and close the tab before coming back.'
     );
   }
   if (!checks.resend) {
@@ -63,6 +68,10 @@ export async function GET() {
       adminBackend: !notesTableError,
     },
     warnings,
+    suggestions,
+    // Taking bookings needs the database and Stripe. Email and the webhook
+    // make it better but are not what stops a customer booking.
     ready: warnings.length === 0,
+    canTakePayments: checks.stripeSecretKey && checks.supabaseServiceRole && !availabilityFnError,
   });
 }

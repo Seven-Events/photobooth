@@ -7,7 +7,9 @@ type Health = {
   stripeMode: 'live' | 'test' | null;
   migrations: Record<string, boolean>;
   warnings: string[];
+  suggestions: string[];
   ready: boolean;
+  canTakePayments: boolean;
 };
 
 const LABELS: Record<string, string> = {
@@ -77,6 +79,11 @@ export default function SetupPage() {
                   ? '✓ Everything is connected — you are ready to take bookings.'
                   : `${health.warnings.length} thing${health.warnings.length === 1 ? '' : 's'} still to sort out.`}
               </p>
+              {health.canTakePayments && (
+                <p style={{ margin: '0.6rem 0 0', fontSize: '0.9rem', color: 'rgba(37,70,65,0.7)' }}>
+                  Customers can book and pay a deposit online right now.
+                </p>
+              )}
             </div>
 
             {health.warnings.length > 0 && (
@@ -85,6 +92,22 @@ export default function SetupPage() {
                 <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'grid', gap: '0.75rem' }}>
                   {health.warnings.map((w) => (
                     <li key={w} style={{ color: 'var(--ink)', fontSize: '0.95rem', lineHeight: 1.6 }}>{w}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {health.suggestions.length > 0 && (
+              <section className="card" style={{ marginBottom: '1.5rem' }}>
+                <h2 style={{ fontSize: '1.1rem', color: 'var(--ink)', marginBottom: '0.5rem' }}>
+                  Optional improvements
+                </h2>
+                <p style={{ fontSize: '0.85rem', color: 'rgba(37,70,65,0.6)', marginTop: 0 }}>
+                  Nothing here is stopping you taking bookings.
+                </p>
+                <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'grid', gap: '0.75rem' }}>
+                  {health.suggestions.map((s) => (
+                    <li key={s} style={{ color: 'var(--ink)', fontSize: '0.95rem', lineHeight: 1.6 }}>{s}</li>
                   ))}
                 </ul>
               </section>
