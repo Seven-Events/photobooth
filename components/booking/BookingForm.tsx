@@ -454,7 +454,7 @@ export default function BookingForm() {
 
             <div>
               <label className="field-label" htmlFor="eventTime">Start time</label>
-              <input id="eventTime" className="field" type="time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} required />
+              <input id="eventTime" className="field" type="time" step={1800} value={eventTime} onChange={(e) => setEventTime(e.target.value)} required />
 
               {selectedRate?.durationHours ? (
                 endTime ? (
