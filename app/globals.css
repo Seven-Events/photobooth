@@ -289,6 +289,29 @@ p {
   }
 }
 
+/* Contact page cards. The email card gets extra width on desktop so the
+   address fits on one line instead of wrapping mid-word. */
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.contact-email-link {
+  word-break: break-word;
+}
+
+@media (min-width: 700px) {
+  .contact-grid {
+    grid-template-columns: 1.4fr 1fr 1fr;
+  }
+
+  .contact-email-link {
+    word-break: normal;
+    white-space: nowrap;
+  }
+}
+
 /* Dashboard and admin sidebars.
    The hover state has to be CSS: these layouts are server components, and
    passing onMouseEnter to a Link there throws "Event handlers cannot be passed

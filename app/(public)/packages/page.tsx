@@ -66,7 +66,10 @@ export default function PackagesPage() {
             // headline is everything that is not part of that table.
             const hourlyIds = new Set(hourlyTable.flatMap((r) => [r.digital, r.prints]));
             const headlineRates = ratesForBooth(booth.id).filter((r) => !hourlyIds.has(r.id));
-            const showHourly = ratesForBooth(booth.id).some((r) => hourlyIds.has(r.id));
+            const boothRateIds = new Set(ratesForBooth(booth.id).map((r) => r.id));
+            const hasDigitalHourly = hourlyTable.some((row) => boothRateIds.has(row.digital));
+            const hasPrintsHourly = hourlyTable.some((row) => boothRateIds.has(row.prints));
+            const showHourly = hasDigitalHourly || hasPrintsHourly;
             return (
               <article
                 key={booth.name}
@@ -186,7 +189,7 @@ export default function PackagesPage() {
                         <div
                           style={{
                             display: 'grid',
-                            gridTemplateColumns: '1.2fr 1fr 1fr',
+                            gridTemplateColumns: hasDigitalHourly && hasPrintsHourly ? '1.2fr 1fr 1fr' : '1.2fr 1fr',
                             gap: '0.4rem 0.75rem',
                             fontSize: '0.85rem',
                             alignItems: 'baseline',
@@ -195,28 +198,36 @@ export default function PackagesPage() {
                           <span style={{ color: 'rgba(37,70,65,0.5)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                             Duration
                           </span>
-                          <span style={{ color: 'rgba(37,70,65,0.5)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', textAlign: 'right' }}>
-                            Digital
-                          </span>
-                          <span style={{ color: 'rgba(37,70,65,0.5)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', textAlign: 'right' }}>
-                            With prints
-                          </span>
+                          {hasDigitalHourly && (
+                            <span style={{ color: 'rgba(37,70,65,0.5)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', textAlign: 'right' }}>
+                              Digital
+                            </span>
+                          )}
+                          {hasPrintsHourly && (
+                            <span style={{ color: 'rgba(37,70,65,0.5)', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', textAlign: 'right' }}>
+                              With prints
+                            </span>
+                          )}
 
                           {hourlyTable.map((row) => (
                             <Fragment key={row.duration}>
                               <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{row.duration}</span>
-                              <span style={{ textAlign: 'right', color: 'var(--ink)' }}>
-                                {formatPrice(getRate(row.digital)!.priceCents)}
-                              </span>
-                              <span style={{ textAlign: 'right', color: 'var(--clay)', fontWeight: 700 }}>
-                                {formatPrice(getRate(row.prints)!.priceCents)}
-                              </span>
+                              {hasDigitalHourly && (
+                                <span style={{ textAlign: 'right', color: 'var(--ink)' }}>
+                                  {boothRateIds.has(row.digital) ? formatPrice(getRate(row.digital)!.priceCents) : '—'}
+                                </span>
+                              )}
+                              {hasPrintsHourly && (
+                                <span style={{ textAlign: 'right', color: 'var(--clay)', fontWeight: 700 }}>
+                                  {boothRateIds.has(row.prints) ? formatPrice(getRate(row.prints)!.priceCents) : '—'}
+                                </span>
+                              )}
                             </Fragment>
                           ))}
                         </div>
 
                         <p style={{ margin: '0.85rem 0 0', fontSize: '0.78rem', color: 'rgba(37,70,65,0.55)' }}>
-                          All hourly rates plus HST. Print packages include unlimited prints.
+                          All hourly rates plus HST.{hasPrintsHourly ? ' Print packages include unlimited prints.' : ''}
                         </p>
                       </div>
                     )}

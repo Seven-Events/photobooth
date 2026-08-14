@@ -35,15 +35,7 @@ export default function ContactPage() {
       </section>
 
       <section style={{ padding: '0 2rem 5rem' }}>
-        <div
-          style={{
-            maxWidth: '1000px',
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '1.5rem',
-          }}
-        >
+        <div className="contact-grid" style={{ maxWidth: '1000px', margin: '0 auto' }}>
           <div
             style={{
               backgroundColor: 'var(--paper)',
@@ -53,10 +45,7 @@ export default function ContactPage() {
             }}
           >
             <h4 style={{ color: 'var(--ink)' }}>Email us</h4>
-            <a
-              href="mailto:info@seveneventsphotobooth.com"
-              style={{ color: 'var(--clay)', fontWeight: 600, wordBreak: 'break-word' }}
-            >
+            <a href="mailto:info@seveneventsphotobooth.com" className="contact-email-link" style={{ color: 'var(--clay)', fontWeight: 600 }}>
               info@seveneventsphotobooth.com
             </a>
             <p style={{ marginTop: '1.5rem', fontSize: '0.95rem', marginBottom: 0 }}>

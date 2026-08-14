@@ -99,8 +99,12 @@ export const booths: Booth[] = [
 ];
 
 /** Attendant-staffed hourly and package rates. Shared between Oak and Mod —
- *  both can run in self-serve OR attendant mode; Snap is drop-off only. */
+ *  both can run attendant mode; Snap is drop-off only. */
 const ATTENDANT_BOOTHS: BoothId[] = ['oak', 'mod'];
+
+/** Digital-only hourly rates are Mod-only — Oak's whole point is the physical
+ *  print, so it never runs a digital-only slot. */
+const DIGITAL_HOURLY_BOOTHS: BoothId[] = ['mod'];
 
 export const rates: Rate[] = [
   {
@@ -126,11 +130,11 @@ export const rates: Rate[] = [
     badge: 'Best for weddings',
   },
   // Attendant-staffed hourly options — available on Oak or Mod.
-  { id: '2h-digital', boothIds: ATTENDANT_BOOTHS, label: '2 hours — digital only', priceCents: 60000, note: 'Staffed by an attendant', durationHours: 2 },
+  { id: '2h-digital', boothIds: DIGITAL_HOURLY_BOOTHS, label: '2 hours — digital only', priceCents: 60000, note: 'Staffed by an attendant', durationHours: 2 },
   { id: '2h-prints', boothIds: ATTENDANT_BOOTHS, label: '2 hours — with prints', priceCents: 80000, note: 'Staffed by an attendant, unlimited prints', durationHours: 2 },
-  { id: '3h-digital', boothIds: ATTENDANT_BOOTHS, label: '3 hours — digital only', priceCents: 75000, note: 'Staffed by an attendant', durationHours: 3 },
+  { id: '3h-digital', boothIds: DIGITAL_HOURLY_BOOTHS, label: '3 hours — digital only', priceCents: 75000, note: 'Staffed by an attendant', durationHours: 3 },
   { id: '3h-prints', boothIds: ATTENDANT_BOOTHS, label: '3 hours — with prints', priceCents: 95000, note: 'Staffed by an attendant, unlimited prints', durationHours: 3 },
-  { id: '4h-digital', boothIds: ATTENDANT_BOOTHS, label: '4 hours — digital only', priceCents: 90000, note: 'Staffed by an attendant', durationHours: 4 },
+  { id: '4h-digital', boothIds: DIGITAL_HOURLY_BOOTHS, label: '4 hours — digital only', priceCents: 90000, note: 'Staffed by an attendant', durationHours: 4 },
   { id: '4h-prints', boothIds: ATTENDANT_BOOTHS, label: '4 hours — with prints', priceCents: 110000, note: 'Staffed by an attendant, unlimited prints', durationHours: 4 },
 ];
 
