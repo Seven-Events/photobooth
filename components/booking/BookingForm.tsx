@@ -14,6 +14,7 @@ import {
 } from '@/lib/packages';
 import { addHoursToTime, daysBeforeDisplay, formatTime } from '@/lib/time';
 import AvailabilityCalendar from './AvailabilityCalendar';
+import TimeWheel from './TimeWheel';
 
 type TravelPreview = {
   feeCents: number;
@@ -21,16 +22,6 @@ type TravelPreview = {
   needsReview: boolean;
   configured: boolean;
 };
-
-// Half-hour slots for the whole day. A native <input type="time"> only
-// validates its step on submit — it still lets you scroll or type any
-// minute — so a fixed dropdown is the only way to actually keep people to
-// 30-minute starts.
-const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
-  const h = String(Math.floor(i / 2)).padStart(2, '0');
-  const m = i % 2 === 0 ? '00' : '30';
-  return `${h}:${m}`;
-});
 
 const PROVINCES = [
   { code: 'ON', label: 'Ontario' },
@@ -54,7 +45,10 @@ export default function BookingForm() {
   const [addonIds, setAddonIds] = useState<string[]>([]);
 
   const [eventDate, setEventDate] = useState('');
-  const [eventTime, setEventTime] = useState('');
+  // TimeWheel always has something centered — there is no "empty" state for
+  // a scroll wheel — so this starts on a plausible evening-event time rather
+  // than blank.
+  const [eventTime, setEventTime] = useState('18:00');
   const [eventTitle, setEventTitle] = useState('');
   const [addressLine1, setAddressLine1] = useState('');
   const [city, setCity] = useState('');
@@ -463,13 +457,8 @@ export default function BookingForm() {
             </div>
 
             <div>
-              <label className="field-label" htmlFor="eventTime">Start time</label>
-              <select id="eventTime" className="field" value={eventTime} onChange={(e) => setEventTime(e.target.value)} required>
-                <option value="" disabled>Select a time</option>
-                {TIME_SLOTS.map((t) => (
-                  <option key={t} value={t}>{formatTime(t)}</option>
-                ))}
-              </select>
+              <span className="field-label">Start time</span>
+              <TimeWheel value={eventTime} onChange={setEventTime} />
 
               {selectedRate?.durationHours ? (
                 endTime ? (

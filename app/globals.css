@@ -289,6 +289,17 @@ p {
   }
 }
 
+/* TimeWheel's scroll columns — hide the scrollbar, the centered highlight
+   box is the only affordance needed. */
+.time-wheel-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.time-wheel-track::-webkit-scrollbar {
+  display: none;
+}
+
 /* Contact page cards. The email card gets extra width on desktop so the
    address fits on one line instead of wrapping mid-word. */
 .contact-grid {
