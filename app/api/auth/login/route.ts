@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -36,11 +37,23 @@ export async function POST(request: Request) {
 
     // Role decides where the login page sends them next — an admin who signs
     // in should land on /admin, not have to know to retype the URL.
-    const { data: profile } = await supabase
+    //
+    // Looked up with the service-role client rather than the just-signed-in
+    // session: this runs a moment after signInWithPassword(), and relying on
+    // that fresh session to already be attached for an RLS-scoped query in
+    // the same request is exactly the kind of timing assumption that fails
+    // silently. The service role sidesteps RLS entirely for this one lookup,
+    // and any failure is logged instead of quietly defaulting to 'client'.
+    const admin = createAdminClient();
+    const { data: profile, error: profileError } = await admin
       .from('users')
       .select('role')
       .eq('id', data.user.id)
       .maybeSingle();
+
+    if (profileError) {
+      console.error('Login role lookup failed for', data.user.id, profileError.message);
+    }
 
     return NextResponse.json(
       {
