@@ -9,8 +9,6 @@ import { NextResponse } from 'next/server';
  * website could never appear here.
  */
 export async function GET() {
-  // Verify the caller is a signed-in admin before touching the service-role
-  // client, which bypasses row level security.
   const supabase = await createClient();
   const {
     data: { user },
@@ -20,13 +18,15 @@ export async function GET() {
     return NextResponse.json({ error: 'Not signed in' }, { status: 401 });
   }
 
-  const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
+  // Role read through the service role rather than the session client — see
+  // lib/admin-api.ts for why relying on RLS here silently misfires.
+  const admin = createAdminClient();
+  const { data: profile } = await admin.from('users').select('role').eq('id', user.id).maybeSingle();
 
   if (profile?.role !== 'admin') {
     return NextResponse.json({ error: 'Not authorised' }, { status: 403 });
   }
 
-  const admin = createAdminClient();
   const { data, error } = await admin
     .from('events')
     .select('*, users(full_name, email, phone)')

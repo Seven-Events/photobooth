@@ -27,7 +27,22 @@ export async function requireAdminApi(): Promise<
     return { error: NextResponse.json({ error: 'Not signed in' }, { status: 401 }) };
   }
 
-  const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).maybeSingle();
+  // getUser() above already verified this caller's identity against Supabase
+  // directly, so this role lookup is not itself a privilege check — reading
+  // it through the service-role client rather than the session-scoped one
+  // just means it does not depend on the "users read own profile" RLS policy
+  // resolving on every request. That dependency is what silently turned a
+  // real admin into "Not authorised" here.
+  const admin = createAdminClient();
+  const { data: profile, error: profileError } = await admin
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profileError) {
+    console.error('Admin role lookup failed for', user.id, profileError.message);
+  }
 
   if (profile?.role !== 'admin') {
     return { error: NextResponse.json({ error: 'Not authorised' }, { status: 403 }) };
@@ -35,7 +50,7 @@ export async function requireAdminApi(): Promise<
 
   return {
     actor: { id: user.id, email: user.email ?? null },
-    db: createAdminClient(),
+    db: admin,
   };
 }
 

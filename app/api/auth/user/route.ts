@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
@@ -13,12 +14,14 @@ export async function GET() {
       );
     }
 
-    // Get user profile
-    const { data: userProfile } = await supabase
+    // Read through the service role rather than the session client — see
+    // lib/admin-api.ts for why relying on RLS here silently misfires.
+    const admin = createAdminClient();
+    const { data: userProfile } = await admin
       .from('users')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     return NextResponse.json(
       {
