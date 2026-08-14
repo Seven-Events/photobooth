@@ -22,6 +22,22 @@ type TravelPreview = {
   configured: boolean;
 };
 
+const PROVINCES = [
+  { code: 'ON', label: 'Ontario' },
+  { code: 'QC', label: 'Quebec' },
+  { code: 'NS', label: 'Nova Scotia' },
+  { code: 'NB', label: 'New Brunswick' },
+  { code: 'MB', label: 'Manitoba' },
+  { code: 'BC', label: 'British Columbia' },
+  { code: 'PE', label: 'Prince Edward Island' },
+  { code: 'SK', label: 'Saskatchewan' },
+  { code: 'AB', label: 'Alberta' },
+  { code: 'NL', label: 'Newfoundland and Labrador' },
+  { code: 'NT', label: 'Northwest Territories' },
+  { code: 'NU', label: 'Nunavut' },
+  { code: 'YT', label: 'Yukon' },
+];
+
 export default function BookingForm() {
   const [boothId, setBoothId] = useState<BoothId>('mod');
   const [rateId, setRateId] = useState('completely-captured');
@@ -30,7 +46,10 @@ export default function BookingForm() {
   const [eventDate, setEventDate] = useState('');
   const [eventTime, setEventTime] = useState('');
   const [eventTitle, setEventTitle] = useState('');
-  const [venue, setVenue] = useState('');
+  const [addressLine1, setAddressLine1] = useState('');
+  const [city, setCity] = useState('');
+  const [province, setProvince] = useState('ON');
+  const [postalCode, setPostalCode] = useState('');
   const [guestCount, setGuestCount] = useState('');
 
   const [fullName, setFullName] = useState('');
@@ -48,6 +67,16 @@ export default function BookingForm() {
   const boothRates = useMemo(() => ratesForBooth(boothId), [boothId]);
   const boothAddons = useMemo(() => addonsForBooth(boothId), [boothId]);
   const selectedRate = useMemo(() => getRate(rateId), [rateId]);
+
+  // One line for the travel-fee lookup and for storage — the four fields are
+  // just for a cleaner form, the rest of the app still deals in one address.
+  const venue = useMemo(() => {
+    const parts = [addressLine1.trim(), city.trim()].filter(Boolean);
+    const provincePostal = [province.trim(), postalCode.trim()].filter(Boolean).join(' ');
+    if (provincePostal) parts.push(provincePostal);
+    return parts.join(', ');
+  }, [addressLine1, city, province, postalCode]);
+  const addressComplete = Boolean(addressLine1.trim() && city.trim() && postalCode.trim());
 
   const totals = useMemo(
     () => calculateTotals(rateId, addonIds, boothId, travel?.feeCents ?? 0),
@@ -86,7 +115,7 @@ export default function BookingForm() {
 
   // Live travel-fee preview, debounced so it does not fire on every keystroke.
   useEffect(() => {
-    if (!venue.trim() || venue.trim().length < 8) {
+    if (!addressComplete) {
       setTravel(null);
       return;
     }
@@ -111,7 +140,7 @@ export default function BookingForm() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [venue]);
+  }, [venue, addressComplete]);
 
   function chooseBooth(id: BoothId) {
     setBoothId(id);
@@ -458,17 +487,63 @@ export default function BookingForm() {
               <input id="guestCount" className="field" type="number" min={1} placeholder="120" value={guestCount} onChange={(e) => setGuestCount(e.target.value)} />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
-              <label className="field-label" htmlFor="venue">Full event address</label>
+              <label className="field-label" htmlFor="addressLine1">Address line 1</label>
               <input
-                id="venue"
+                id="addressLine1"
                 className="field"
                 type="text"
-                placeholder="123 Main St, Lindsay, ON K9V 1A1"
-                value={venue}
-                onChange={(e) => setVenue(e.target.value)}
+                autoComplete="address-line1"
+                placeholder="123 Main St"
+                value={addressLine1}
+                onChange={(e) => setAddressLine1(e.target.value)}
                 required
               />
-              <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: '0.5rem 0 0' }}>
+            </div>
+            <div>
+              <label className="field-label" htmlFor="city">City</label>
+              <input
+                id="city"
+                className="field"
+                type="text"
+                autoComplete="address-level2"
+                placeholder="Lindsay"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="field-label" htmlFor="province">Province</label>
+              <select
+                id="province"
+                className="field"
+                autoComplete="address-level1"
+                value={province}
+                onChange={(e) => setProvince(e.target.value)}
+                required
+              >
+                {PROVINCES.map((p) => (
+                  <option key={p.code} value={p.code}>{p.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="field-label" htmlFor="postalCode">Postal code</label>
+              <input
+                id="postalCode"
+                className="field"
+                type="text"
+                autoComplete="postal-code"
+                placeholder="K9V 1A1"
+                pattern="^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$"
+                title="A Canadian postal code, e.g. K9V 1A1"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value.toUpperCase())}
+                required
+              />
+            </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: 0 }}>
                 {travelLoading
                   ? 'Checking the distance…'
                   : travel?.configured && !travel.needsReview
@@ -544,7 +619,11 @@ export default function BookingForm() {
               {totals.travelFeeCents > 0 && (
                 <Row label="Travel fee" value={'+ ' + formatPrice(totals.travelFeeCents)} muted />
               )}
-              <Row label="HST" value={formatPrice(totals.hstCents)} muted />
+
+              <div style={{ borderTop: '1px solid rgba(250,247,239,0.2)', margin: '1rem 0', paddingTop: '1rem' }}>
+                <Row label="Subtotal" value={formatPrice(totals.subtotalCents)} />
+                <Row label="HST" value={formatPrice(totals.hstCents)} muted />
+              </div>
 
               <div style={{ borderTop: '1px solid rgba(250,247,239,0.2)', margin: '1rem 0', paddingTop: '1rem' }}>
                 <Row label="Total" value={formatPrice(totals.totalCents)} bold />
