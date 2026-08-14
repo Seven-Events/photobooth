@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth';
+import LogoutButton from '@/components/site/LogoutButton';
 
 const links = [
   { href: '/admin/dashboard', label: '📊 Dashboard' },
@@ -38,10 +39,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           ))}
         </nav>
 
-        <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.2)' }}>
+        <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.2)', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <Link href="/" style={{ color: 'var(--cream)', fontSize: '0.875rem', textDecoration: 'none' }}>
             ← Back to the site
           </Link>
+          <LogoutButton />
         </div>
       </aside>
 

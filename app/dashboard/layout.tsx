@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requireAuth } from '@/lib/auth';
+import LogoutButton from '@/components/site/LogoutButton';
 
 const links = [
   { href: '/dashboard/events', label: '📅 My Bookings' },
@@ -39,9 +40,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <p style={{ fontSize: '0.875rem', color: 'rgba(250,247,239,0.7)', marginBottom: '1rem' }}>
             Need help? Email info@seveneventsphotobooth.com
           </p>
-          <Link href="/" style={{ color: 'var(--cream)', fontSize: '0.875rem', textDecoration: 'none' }}>
+          <Link href="/" style={{ color: 'var(--cream)', fontSize: '0.875rem', textDecoration: 'none', display: 'block', marginBottom: '0.75rem' }}>
             ← Back to the site
           </Link>
+          <LogoutButton />
         </div>
       </aside>
 
