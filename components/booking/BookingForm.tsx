@@ -435,8 +435,8 @@ export default function BookingForm() {
             Your event
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
-            <div style={{ gridColumn: '1 / -1' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+            <div>
               <label className="field-label">Event date</label>
               <AvailabilityCalendar boothId={boothId} value={eventDate} onChange={setEventDate} />
               {availability === 'checking' && (
@@ -482,15 +482,13 @@ export default function BookingForm() {
               )}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div>
-                <label className="field-label" htmlFor="eventTitle">Type of event</label>
-                <input id="eventTitle" className="field" type="text" placeholder="Wedding, staff party, birthday…" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
-              </div>
-              <div>
-                <label className="field-label" htmlFor="guestCount">Approx. guests</label>
-                <input id="guestCount" className="field" type="number" min={1} placeholder="120" value={guestCount} onChange={(e) => setGuestCount(e.target.value)} />
-              </div>
+            <div>
+              <label className="field-label" htmlFor="eventTitle">Type of event</label>
+              <input id="eventTitle" className="field" type="text" placeholder="Wedding, staff party, birthday…" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
+            </div>
+            <div>
+              <label className="field-label" htmlFor="guestCount">Approx. guests</label>
+              <input id="guestCount" className="field" type="number" min={1} placeholder="120" value={guestCount} onChange={(e) => setGuestCount(e.target.value)} />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
               <label className="field-label" htmlFor="addressLine1">Address line 1</label>
