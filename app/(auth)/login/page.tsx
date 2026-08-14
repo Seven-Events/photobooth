@@ -22,7 +22,8 @@ export default function LoginPage() {
       });
 
       if (response.ok) {
-        window.location.href = '/dashboard';
+        const data = await response.json();
+        window.location.href = data.user?.role === 'admin' ? '/admin' : '/dashboard';
       } else {
         const data = await response.json();
         setError(data.error || 'Login failed');

@@ -34,12 +34,21 @@ export async function POST(request: Request) {
       );
     }
 
+    // Role decides where the login page sends them next — an admin who signs
+    // in should land on /admin, not have to know to retype the URL.
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', data.user.id)
+      .maybeSingle();
+
     return NextResponse.json(
       {
         success: true,
         user: {
           id: data.user.id,
           email: data.user.email,
+          role: profile?.role ?? 'client',
         },
       },
       { status: 200 }
