@@ -22,6 +22,16 @@ type TravelPreview = {
   configured: boolean;
 };
 
+// Half-hour slots for the whole day. A native <input type="time"> only
+// validates its step on submit — it still lets you scroll or type any
+// minute — so a fixed dropdown is the only way to actually keep people to
+// 30-minute starts.
+const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
+  const h = String(Math.floor(i / 2)).padStart(2, '0');
+  const m = i % 2 === 0 ? '00' : '30';
+  return `${h}:${m}`;
+});
+
 const PROVINCES = [
   { code: 'ON', label: 'Ontario' },
   { code: 'QC', label: 'Quebec' },
@@ -454,7 +464,12 @@ export default function BookingForm() {
 
             <div>
               <label className="field-label" htmlFor="eventTime">Start time</label>
-              <input id="eventTime" className="field" type="time" step={1800} value={eventTime} onChange={(e) => setEventTime(e.target.value)} required />
+              <select id="eventTime" className="field" value={eventTime} onChange={(e) => setEventTime(e.target.value)} required>
+                <option value="" disabled>Select a time</option>
+                {TIME_SLOTS.map((t) => (
+                  <option key={t} value={t}>{formatTime(t)}</option>
+                ))}
+              </select>
 
               {selectedRate?.durationHours ? (
                 endTime ? (
