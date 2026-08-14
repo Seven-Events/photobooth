@@ -7,6 +7,7 @@ const links = [
   { href: '/admin/bookings', label: '📅 Bookings' },
   { href: '/admin/clients', label: '👥 Clients' },
   { href: '/admin/team', label: '🔑 Team' },
+  { href: '/admin/setup', label: '⚙️ Setup check' },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
