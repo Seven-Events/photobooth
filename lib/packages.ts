@@ -13,12 +13,21 @@ export type BoothId = 'snap' | 'oak' | 'mod';
 
 export type Rate = {
   id: string;
-  boothId: BoothId;
+  /** A rate can belong to more than one booth — Completely Captured and the
+   *  hourly packages run on either Oak or Mod, whichever the customer picked. */
+  boothIds: BoothId[];
   label: string;
   /** Cents, excluding HST. */
   priceCents: number;
   note: string;
   badge?: string;
+  /**
+   * Hours of contiguous coverage, for rates with a simple start+duration
+   * shape. Omitted for drop-off packages (a 14-hour window, not a booked
+   * slot) and Completely Captured (two separate blocks with a gap between
+   * them) — both need their own copy rather than a computed end time.
+   */
+  durationHours?: number;
 };
 
 export type Booth = {
@@ -47,6 +56,8 @@ export type Addon = {
    */
   perUnit?: string;
   maxUnits?: number;
+  /** Restricts this add-on to specific booths. Omit for "available on any booth". */
+  boothIds?: BoothId[];
 };
 
 /** True of every booth. All three carry a DSLR body and studio lighting. */
@@ -87,51 +98,51 @@ export const booths: Booth[] = [
   },
 ];
 
+/** Attendant-staffed hourly and package rates. Shared between Oak and Mod —
+ *  both can run in self-serve OR attendant mode; Snap is drop-off only. */
+const ATTENDANT_BOOTHS: BoothId[] = ['oak', 'mod'];
+
 export const rates: Rate[] = [
   {
     id: 'snap-digital-dropoff',
-    boothId: 'snap',
+    boothIds: ['snap'],
     label: 'Digital Drop-off',
     priceCents: 60000,
     note: 'Up to 14 hours unlimited use — no attendant, no prints',
   },
   {
     id: 'oak-print-dropoff',
-    boothId: 'oak',
+    boothIds: ['oak'],
     label: 'Print Drop-off',
     priceCents: 75000,
     note: 'Up to 14 hours unlimited use — no attendant, max 300 prints',
   },
   {
-    id: 'mod-completely-captured',
-    boothId: 'mod',
+    id: 'completely-captured',
+    boothIds: ATTENDANT_BOOTHS,
     label: 'Completely Captured',
     priceCents: 120000,
     note: '1.5 hrs cocktail hour plus 3 hrs reception — split coverage so there is never a line',
     badge: 'Best for weddings',
   },
-  // Attendant-staffed hourly options, Mod Booth only.
-  { id: 'mod-2h-digital', boothId: 'mod', label: '2 hours — digital only', priceCents: 60000, note: 'Staffed by an attendant' },
-  { id: 'mod-2h-prints', boothId: 'mod', label: '2 hours — with prints', priceCents: 80000, note: 'Staffed by an attendant, unlimited prints' },
-  { id: 'mod-3h-digital', boothId: 'mod', label: '3 hours — digital only', priceCents: 75000, note: 'Staffed by an attendant' },
-  { id: 'mod-3h-prints', boothId: 'mod', label: '3 hours — with prints', priceCents: 95000, note: 'Staffed by an attendant, unlimited prints' },
-  { id: 'mod-4h-digital', boothId: 'mod', label: '4 hours — digital only', priceCents: 90000, note: 'Staffed by an attendant' },
-  { id: 'mod-4h-prints', boothId: 'mod', label: '4 hours — with prints', priceCents: 110000, note: 'Staffed by an attendant, unlimited prints' },
+  // Attendant-staffed hourly options — available on Oak or Mod.
+  { id: '2h-digital', boothIds: ATTENDANT_BOOTHS, label: '2 hours — digital only', priceCents: 60000, note: 'Staffed by an attendant', durationHours: 2 },
+  { id: '2h-prints', boothIds: ATTENDANT_BOOTHS, label: '2 hours — with prints', priceCents: 80000, note: 'Staffed by an attendant, unlimited prints', durationHours: 2 },
+  { id: '3h-digital', boothIds: ATTENDANT_BOOTHS, label: '3 hours — digital only', priceCents: 75000, note: 'Staffed by an attendant', durationHours: 3 },
+  { id: '3h-prints', boothIds: ATTENDANT_BOOTHS, label: '3 hours — with prints', priceCents: 95000, note: 'Staffed by an attendant, unlimited prints', durationHours: 3 },
+  { id: '4h-digital', boothIds: ATTENDANT_BOOTHS, label: '4 hours — digital only', priceCents: 90000, note: 'Staffed by an attendant', durationHours: 4 },
+  { id: '4h-prints', boothIds: ATTENDANT_BOOTHS, label: '4 hours — with prints', priceCents: 110000, note: 'Staffed by an attendant, unlimited prints', durationHours: 4 },
 ];
 
 /** Rendered as the hourly comparison table on the packages page. */
 export const hourlyTable = [
-  { duration: '2 hours', digital: 'mod-2h-digital', prints: 'mod-2h-prints' },
-  { duration: '3 hours', digital: 'mod-3h-digital', prints: 'mod-3h-prints' },
-  { duration: '4 hours', digital: 'mod-4h-digital', prints: 'mod-4h-prints' },
+  { duration: '2 hours', digital: '2h-digital', prints: '2h-prints' },
+  { duration: '3 hours', digital: '3h-digital', prints: '3h-prints' },
+  { duration: '4 hours', digital: '4h-digital', prints: '4h-prints' },
 ];
 
 /**
  * Only add-ons Seven Events actually sells.
- *
- * Three placeholders (extra hour, premium backdrop, guest book) were removed
- * rather than left in — they were invented during the build and were never
- * confirmed as real products. Add any genuine ones back here.
  */
 export const addons: Addon[] = [
   {
@@ -142,13 +153,20 @@ export const addons: Addon[] = [
     perUnit: 'hour',
     maxUnits: 6,
   },
+  {
+    id: 'linen-guestbook',
+    label: 'Linen photo guestbook',
+    priceCents: 7500,
+    note: 'A linen-bound book guests fill with a printed photo and a message. Needs a print package.',
+    boothIds: ['oak', 'mod'],
+  },
 ];
 
 /**
- * Deposit taken online to hold the date. The balance is invoiced separately.
- * ASSUMPTION — confirm the rate with the owner before going live.
+ * Deposit taken online to hold the date. The balance is due 7 days before the
+ * event and invoiced separately.
  */
-export const DEPOSIT_PERCENT = 25;
+export const DEPOSIT_PERCENT = 35;
 
 /** HST. Shown on the site as "+ HST" and applied at invoicing. */
 export const HST_PERCENT = 13;
@@ -162,12 +180,18 @@ export function getBooth(boothId: string): Booth | undefined {
 }
 
 export function ratesForBooth(boothId: BoothId): Rate[] {
-  return rates.filter((r) => r.boothId === boothId);
+  return rates.filter((r) => r.boothIds.includes(boothId));
+}
+
+/** Add-ons sellable on this booth — everything with no boothIds restriction,
+ *  plus anything explicitly scoped to it. */
+export function addonsForBooth(boothId: BoothId): Addon[] {
+  return addons.filter((a) => !a.boothIds || a.boothIds.includes(boothId));
 }
 
 /** The headline rate shown on a booth card — the first one defined for it. */
 export function featuredRate(boothId: BoothId): Rate | undefined {
-  return rates.find((r) => r.boothId === boothId);
+  return rates.find((r) => r.boothIds.includes(boothId));
 }
 
 export function formatPrice(cents: number): string {
@@ -203,19 +227,41 @@ export function groupAddons(addonIds: string[]) {
 /**
  * Authoritative price calculation. The client shows a running total, but the
  * server recomputes from these ids — never trust a total sent by the browser.
+ *
+ * Returns null if the rate does not exist, does not belong to the given
+ * booth, or any add-on does not belong to the given booth — e.g. the linen
+ * guestbook on the digital-only Snap Booth. Travel fee is a separate,
+ * optional add-in since it depends on an address, not a catalogue id.
  */
-export function calculateTotals(rateId: string, addonIds: string[]) {
+export function calculateTotals(
+  rateId: string,
+  addonIds: string[],
+  boothId: BoothId,
+  travelFeeCents = 0
+) {
   const rate = getRate(rateId);
-  if (!rate) return null;
+  if (!rate || !rate.boothIds.includes(boothId)) return null;
+
+  const allowedAddonIds = new Set(addonsForBooth(boothId).map((a) => a.id));
+  if (addonIds.some((id) => !allowedAddonIds.has(id))) return null;
 
   const chosenAddons = addonIds
     .map((id) => addons.find((a) => a.id === id))
     .filter((a): a is Addon => Boolean(a));
 
-  const subtotalCents = rate.priceCents + chosenAddons.reduce((sum, a) => sum + a.priceCents, 0);
+  const addonsCents = chosenAddons.reduce((sum, a) => sum + a.priceCents, 0);
+  const subtotalCents = rate.priceCents + addonsCents + travelFeeCents;
   const hstCents = Math.round(subtotalCents * (HST_PERCENT / 100));
   const totalCents = subtotalCents + hstCents;
   const depositCents = Math.round(totalCents * (DEPOSIT_PERCENT / 100));
 
-  return { rate, addons: chosenAddons, subtotalCents, hstCents, totalCents, depositCents };
+  return {
+    rate,
+    addons: chosenAddons,
+    travelFeeCents,
+    subtotalCents,
+    hstCents,
+    totalCents,
+    depositCents,
+  };
 }

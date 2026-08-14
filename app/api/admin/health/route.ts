@@ -18,6 +18,7 @@ export async function GET() {
     stripeWebhookSecret: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
     resend: Boolean(process.env.RESEND_API_KEY),
     siteUrl: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
+    googleMaps: Boolean(process.env.GOOGLE_MAPS_API_KEY),
   };
 
   // Test vs live is worth surfacing: taking real money on test keys silently
@@ -35,6 +36,7 @@ export async function GET() {
   });
 
   const { error: notesTableError } = await gate.db.from('booking_notes').select('id').limit(1);
+  const { error: travelColumnError } = await gate.db.from('events').select('travel_fee_cents').limit(1);
 
   const warnings: string[] = [];
   const suggestions: string[] = [];
@@ -59,6 +61,16 @@ export async function GET() {
   if (notesTableError) {
     warnings.push('Migration 002 does not look applied: the booking_notes table is missing.');
   }
+  if (travelColumnError) {
+    warnings.push('Migration 003 does not look applied: the travel fee columns are missing.');
+  }
+  if (!checks.googleMaps) {
+    // Not a blocker: bookings outside the free radius still save, just with
+    // no fee charged and travel_fee_needs_review set, ready for a manual check.
+    suggestions.push(
+      'GOOGLE_MAPS_API_KEY is not set, so travel fees are not calculated automatically. Bookings past the free 100 km radius are still saved, flagged for a manual check instead of being charged nothing silently.'
+    );
+  }
 
   return NextResponse.json({
     checks,
@@ -66,11 +78,12 @@ export async function GET() {
     migrations: {
       bookingSystem: !availabilityFnError,
       adminBackend: !notesTableError,
+      travelFee: !travelColumnError,
     },
     warnings,
     suggestions,
-    // Taking bookings needs the database and Stripe. Email and the webhook
-    // make it better but are not what stops a customer booking.
+    // Taking bookings needs the database and Stripe. Email, the webhook and
+    // the travel fee lookup make it better but are not what stops a booking.
     ready: warnings.length === 0,
     canTakePayments: checks.stripeSecretKey && checks.supabaseServiceRole && !availabilityFnError,
   });

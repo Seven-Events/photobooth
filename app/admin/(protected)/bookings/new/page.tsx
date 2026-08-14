@@ -2,13 +2,23 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { addons, booths, calculateTotals, formatPrice, ratesForBooth, type BoothId } from '@/lib/packages';
+import {
+  addonsForBooth,
+  booths,
+  calculateTotals,
+  formatPrice,
+  ratesForBooth,
+  HST_PERCENT,
+  DEPOSIT_PERCENT,
+  type BoothId,
+} from '@/lib/packages';
 
 export default function NewBookingPage() {
   const [boothId, setBoothId] = useState<BoothId>('mod');
-  const [rateId, setRateId] = useState('mod-completely-captured');
+  const [rateId, setRateId] = useState('completely-captured');
   const [addonIds, setAddonIds] = useState<string[]>([]);
   const [overrideSubtotal, setOverrideSubtotal] = useState('');
+  const [overrideTravelFee, setOverrideTravelFee] = useState('');
 
   const [form, setForm] = useState({
     fullName: '',
@@ -28,24 +38,38 @@ export default function NewBookingPage() {
   const [error, setError] = useState('');
 
   const boothRates = useMemo(() => ratesForBooth(boothId), [boothId]);
-  const standard = useMemo(() => calculateTotals(rateId, addonIds), [rateId, addonIds]);
+  const boothAddons = useMemo(() => addonsForBooth(boothId), [boothId]);
 
-  // Mirror the server: an override replaces the subtotal, and tax and deposit
-  // are recalculated from it.
+  const travelFeeCents = overrideTravelFee === '' ? 0 : Math.round(Number(overrideTravelFee) * 100);
+  const standard = useMemo(
+    () => calculateTotals(rateId, addonIds, boothId, Number.isFinite(travelFeeCents) ? travelFeeCents : 0),
+    [rateId, addonIds, boothId, travelFeeCents]
+  );
+
+  // Mirror the server: an override replaces the subtotal (rate + add-ons +
+  // travel combined), and tax and deposit recalculate from it.
   const totals = useMemo(() => {
     if (!standard) return null;
     if (overrideSubtotal === '') return standard;
     const subtotalCents = Math.round(Number(overrideSubtotal) * 100);
     if (!Number.isFinite(subtotalCents) || subtotalCents < 0) return standard;
-    const hstCents = Math.round(subtotalCents * 0.13);
+    const hstCents = Math.round(subtotalCents * (HST_PERCENT / 100));
     const totalCents = subtotalCents + hstCents;
-    return { ...standard, subtotalCents, hstCents, totalCents, depositCents: Math.round(totalCents * 0.25) };
+    return {
+      ...standard,
+      subtotalCents,
+      hstCents,
+      totalCents,
+      depositCents: Math.round(totalCents * (DEPOSIT_PERCENT / 100)),
+    };
   }, [standard, overrideSubtotal]);
 
   function chooseBooth(id: BoothId) {
     setBoothId(id);
     const first = ratesForBooth(id)[0];
     if (first) setRateId(first.id);
+    const validAddonIds = new Set(addonsForBooth(id).map((a) => a.id));
+    setAddonIds((prev) => prev.filter((a) => validAddonIds.has(a)));
   }
 
   async function submit(e: React.FormEvent) {
@@ -57,7 +81,7 @@ export default function NewBookingPage() {
       const res = await fetch('/api/admin/bookings/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, boothId, rateId, addonIds, overrideSubtotal }),
+        body: JSON.stringify({ ...form, boothId, rateId, addonIds, overrideSubtotal, overrideTravelFee }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -147,69 +171,90 @@ export default function NewBookingPage() {
               </div>
             </div>
 
-            <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
-              <legend className="field-label" style={{ padding: 0 }}>Add-ons</legend>
-              <div style={{ display: 'grid', gap: '0.6rem' }}>
-                {addons.map((a) => {
-                  const qty = addonIds.filter((x) => x === a.id).length;
+            {boothAddons.length > 0 && (
+              <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
+                <legend className="field-label" style={{ padding: 0 }}>Add-ons</legend>
+                <div style={{ display: 'grid', gap: '0.6rem' }}>
+                  {boothAddons.map((a) => {
+                    const qty = addonIds.filter((x) => x === a.id).length;
 
-                  if (a.perUnit) {
+                    if (a.perUnit) {
+                      return (
+                        <div key={a.id} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', fontSize: '0.92rem', color: 'var(--ink)', flexWrap: 'wrap' }}>
+                          <select
+                            className="field"
+                            style={{ width: 'auto', padding: '0.4rem 0.6rem' }}
+                            value={qty}
+                            onChange={(e) => {
+                              const n = Number(e.target.value);
+                              setAddonIds((prev) => [...prev.filter((x) => x !== a.id), ...Array(n).fill(a.id)]);
+                            }}
+                          >
+                            {Array.from({ length: (a.maxUnits ?? 4) + 1 }).map((_, n) => (
+                              <option key={n} value={n}>{n}</option>
+                            ))}
+                          </select>
+                          {a.label} — {formatPrice(a.priceCents)} / {a.perUnit}
+                          {qty > 0 && (
+                            <strong style={{ color: 'var(--clay)' }}>{formatPrice(a.priceCents * qty)}</strong>
+                          )}
+                        </div>
+                      );
+                    }
+
                     return (
-                      <div key={a.id} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', fontSize: '0.92rem', color: 'var(--ink)', flexWrap: 'wrap' }}>
-                        <select
-                          className="field"
-                          style={{ width: 'auto', padding: '0.4rem 0.6rem' }}
-                          value={qty}
-                          onChange={(e) => {
-                            const n = Number(e.target.value);
-                            setAddonIds((prev) => [...prev.filter((x) => x !== a.id), ...Array(n).fill(a.id)]);
-                          }}
-                        >
-                          {Array.from({ length: (a.maxUnits ?? 4) + 1 }).map((_, n) => (
-                            <option key={n} value={n}>{n}</option>
-                          ))}
-                        </select>
-                        {a.label} — {formatPrice(a.priceCents)} / {a.perUnit}
-                        {qty > 0 && (
-                          <strong style={{ color: 'var(--clay)' }}>{formatPrice(a.priceCents * qty)}</strong>
-                        )}
-                      </div>
+                      <label key={a.id} style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', fontSize: '0.92rem', color: 'var(--ink)' }}>
+                        <input
+                          type="checkbox"
+                          checked={qty > 0}
+                          style={{ accentColor: 'var(--clay)' }}
+                          onChange={() =>
+                            setAddonIds((prev) => prev.includes(a.id) ? prev.filter((x) => x !== a.id) : [...prev, a.id])
+                          }
+                        />
+                        {a.label} — {formatPrice(a.priceCents)}
+                      </label>
                     );
-                  }
+                  })}
+                </div>
+              </fieldset>
+            )}
 
-                  return (
-                    <label key={a.id} style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', fontSize: '0.92rem', color: 'var(--ink)' }}>
-                      <input
-                        type="checkbox"
-                        checked={qty > 0}
-                        style={{ accentColor: 'var(--clay)' }}
-                        onChange={() =>
-                          setAddonIds((prev) => prev.includes(a.id) ? prev.filter((x) => x !== a.id) : [...prev, a.id])
-                        }
-                      />
-                      {a.label} — {formatPrice(a.priceCents)}
-                    </label>
-                  );
-                })}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginTop: '1.5rem' }}>
+              <div>
+                <label className="field-label" htmlFor="travelFee">Travel fee (optional)</label>
+                <input
+                  id="travelFee"
+                  className="field"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder="0.00"
+                  value={overrideTravelFee}
+                  onChange={(e) => setOverrideTravelFee(e.target.value)}
+                />
+                <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: '0.5rem 0 0' }}>
+                  Free within 100 km of Omemee. $2/km beyond that — type the amount if you already
+                  worked it out with the customer.
+                </p>
               </div>
-            </fieldset>
-
-            <div style={{ marginTop: '1.5rem' }}>
-              <label className="field-label" htmlFor="override">Override price (optional)</label>
-              <input
-                id="override"
-                className="field"
-                type="number"
-                min={0}
-                step="0.01"
-                placeholder={standard ? (standard.subtotalCents / 100).toFixed(2) : ''}
-                value={overrideSubtotal}
-                onChange={(e) => setOverrideSubtotal(e.target.value)}
-              />
-              <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: '0.5rem 0 0' }}>
-                Before HST. Leave blank to use the published price. HST and the deposit recalculate
-                from whatever you enter.
-              </p>
+              <div>
+                <label className="field-label" htmlFor="override">Override price (optional)</label>
+                <input
+                  id="override"
+                  className="field"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  placeholder={standard ? (standard.subtotalCents / 100).toFixed(2) : ''}
+                  value={overrideSubtotal}
+                  onChange={(e) => setOverrideSubtotal(e.target.value)}
+                />
+                <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: '0.5rem 0 0' }}>
+                  Before HST. Replaces the rate, add-ons and travel fee combined. Leave blank to use
+                  the published price.
+                </p>
+              </div>
             </div>
           </section>
 
@@ -237,8 +282,8 @@ export default function NewBookingPage() {
                   onChange={(e) => setForm({ ...form, guestCount: e.target.value })} />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
-                <label className="field-label" htmlFor="venue">Venue</label>
-                <input id="venue" className="field" value={form.venue}
+                <label className="field-label" htmlFor="venue">Full event address</label>
+                <input id="venue" className="field" placeholder="123 Main St, Lindsay, ON K9V 1A1" value={form.venue}
                   onChange={(e) => setForm({ ...form, venue: e.target.value })} />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
@@ -276,9 +321,12 @@ export default function NewBookingPage() {
             <section className="card" style={{ ...card, backgroundColor: 'var(--ink)', color: 'var(--cream)' }}>
               <h2 style={{ fontSize: '1.1rem', color: 'var(--cream)', marginBottom: '1rem' }}>Total</h2>
               <Row label="Subtotal" value={formatPrice(totals.subtotalCents)} />
+              {totals.travelFeeCents > 0 && overrideSubtotal === '' && (
+                <Row label="incl. travel fee" value={formatPrice(totals.travelFeeCents)} muted />
+              )}
               <Row label="HST" value={formatPrice(totals.hstCents)} muted />
               <Row label="Total" value={formatPrice(totals.totalCents)} bold />
-              <Row label="Deposit" value={formatPrice(totals.depositCents)} accent />
+              <Row label={`${DEPOSIT_PERCENT}% deposit`} value={formatPrice(totals.depositCents)} accent />
             </section>
           )}
 

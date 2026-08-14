@@ -2,24 +2,29 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  addons,
+  addonsForBooth,
   booths,
   calculateTotals,
+  DEPOSIT_PERCENT,
   formatPrice,
+  getRate,
   groupAddons,
   ratesForBooth,
   type BoothId,
 } from '@/lib/packages';
+import { addHoursToTime, daysBeforeDisplay, formatTime } from '@/lib/time';
+import AvailabilityCalendar from './AvailabilityCalendar';
 
-/** Today in YYYY-MM-DD, used to stop anyone booking a date in the past. */
-function today(): string {
-  const d = new Date();
-  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-}
+type TravelPreview = {
+  feeCents: number;
+  distanceKm: number | null;
+  needsReview: boolean;
+  configured: boolean;
+};
 
 export default function BookingForm() {
   const [boothId, setBoothId] = useState<BoothId>('mod');
-  const [rateId, setRateId] = useState('mod-completely-captured');
+  const [rateId, setRateId] = useState('completely-captured');
   const [addonIds, setAddonIds] = useState<string[]>([]);
 
   const [eventDate, setEventDate] = useState('');
@@ -37,9 +42,22 @@ export default function BookingForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [availability, setAvailability] = useState<'unknown' | 'checking' | 'free' | 'taken'>('unknown');
+  const [travel, setTravel] = useState<TravelPreview | null>(null);
+  const [travelLoading, setTravelLoading] = useState(false);
 
   const boothRates = useMemo(() => ratesForBooth(boothId), [boothId]);
-  const totals = useMemo(() => calculateTotals(rateId, addonIds), [rateId, addonIds]);
+  const boothAddons = useMemo(() => addonsForBooth(boothId), [boothId]);
+  const selectedRate = useMemo(() => getRate(rateId), [rateId]);
+
+  const totals = useMemo(
+    () => calculateTotals(rateId, addonIds, boothId, travel?.feeCents ?? 0),
+    [rateId, addonIds, boothId, travel]
+  );
+
+  const endTime = useMemo(() => {
+    if (!eventTime || !selectedRate?.durationHours) return null;
+    return addHoursToTime(eventTime, selectedRate.durationHours);
+  }, [eventTime, selectedRate]);
 
   // Tell people the date is gone while they are still choosing, rather than
   // after they have filled in the whole form. The server checks again on submit.
@@ -66,11 +84,44 @@ export default function BookingForm() {
     };
   }, [eventDate, boothId]);
 
+  // Live travel-fee preview, debounced so it does not fire on every keystroke.
+  useEffect(() => {
+    if (!venue.trim() || venue.trim().length < 8) {
+      setTravel(null);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      setTravelLoading(true);
+      fetch(`/api/travel-fee?address=${encodeURIComponent(venue)}`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (!cancelled) setTravel(d);
+        })
+        .catch(() => {
+          if (!cancelled) setTravel(null);
+        })
+        .finally(() => {
+          if (!cancelled) setTravelLoading(false);
+        });
+    }, 800);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [venue]);
+
   function chooseBooth(id: BoothId) {
     setBoothId(id);
-    // The current rate belongs to the old booth, so move to the new booth's first.
+    // The current rate and any booth-restricted add-ons belong to the old
+    // booth, so move to the new booth's first rate and drop anything that no
+    // longer applies — e.g. the linen guestbook is not valid on Snap.
     const first = ratesForBooth(id)[0];
     if (first) setRateId(first.id);
+    const validAddonIds = new Set(addonsForBooth(id).map((a) => a.id));
+    setAddonIds((prev) => prev.filter((a) => validAddonIds.has(a)));
   }
 
   function toggleAddon(id: string) {
@@ -146,6 +197,8 @@ export default function BookingForm() {
     marginBottom: '0.75rem',
     display: 'block',
   };
+
+  const dueDate = daysBeforeDisplay(eventDate, 7);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -254,89 +307,91 @@ export default function BookingForm() {
         </fieldset>
 
         {/* 3 — add-ons */}
-        <fieldset style={sectionStyle}>
-          <legend style={{ padding: 0 }}>
-            <span style={stepLabel}>Step 3 — optional</span>
-          </legend>
-          <h2 style={{ fontSize: 'clamp(1.35rem, 3vw, 1.75rem)', color: 'var(--ink)', marginBottom: '1.25rem' }}>
-            Add-ons
-          </h2>
+        {boothAddons.length > 0 && (
+          <fieldset style={sectionStyle}>
+            <legend style={{ padding: 0 }}>
+              <span style={stepLabel}>Step 3 — optional</span>
+            </legend>
+            <h2 style={{ fontSize: 'clamp(1.35rem, 3vw, 1.75rem)', color: 'var(--ink)', marginBottom: '1.25rem' }}>
+              Add-ons
+            </h2>
 
-          <div style={{ display: 'grid', gap: '0.75rem' }}>
-            {addons.map((a) => {
-              const qty = addonQty(a.id);
-              const selected = qty > 0;
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {boothAddons.map((a) => {
+                const qty = addonQty(a.id);
+                const selected = qty > 0;
 
-              const header = (
-                <span style={{ flex: 1 }}>
-                  <span style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 700, color: 'var(--ink)' }}>{a.label}</span>
-                    <span style={{ fontWeight: 700, color: 'var(--clay)', whiteSpace: 'nowrap' }}>
-                      + {formatPrice(a.priceCents)}
-                      {a.perUnit ? ` / ${a.perUnit}` : ''}
+                const header = (
+                  <span style={{ flex: 1 }}>
+                    <span style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                      <span style={{ fontWeight: 700, color: 'var(--ink)' }}>{a.label}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--clay)', whiteSpace: 'nowrap' }}>
+                        + {formatPrice(a.priceCents)}
+                        {a.perUnit ? ` / ${a.perUnit}` : ''}
+                      </span>
+                    </span>
+                    <span style={{ display: 'block', fontSize: '0.85rem', color: 'rgba(37,70,65,0.65)', marginTop: '0.35rem' }}>
+                      {a.note}
                     </span>
                   </span>
-                  <span style={{ display: 'block', fontSize: '0.85rem', color: 'rgba(37,70,65,0.65)', marginTop: '0.35rem' }}>
-                    {a.note}
-                  </span>
-                </span>
-              );
-
-              const boxStyle: React.CSSProperties = {
-                display: 'flex',
-                gap: '1rem',
-                alignItems: 'flex-start',
-                borderRadius: '0.85rem',
-                border: selected ? '2px solid var(--clay)' : '1px solid var(--line)',
-                backgroundColor: selected ? 'rgba(229,139,130,0.08)' : 'var(--cream)',
-                padding: '1rem 1.25rem',
-              };
-
-              // Per-unit add-ons get a quantity picker instead of a checkbox —
-              // "$75 / hour" is meaningless without a number of hours.
-              if (a.perUnit) {
-                return (
-                  <div key={a.id} style={{ ...boxStyle, flexWrap: 'wrap' }}>
-                    {header}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                      <label className="field-label" htmlFor={`qty-${a.id}`} style={{ margin: 0 }}>
-                        {a.perUnit}s
-                      </label>
-                      <select
-                        id={`qty-${a.id}`}
-                        className="field"
-                        style={{ width: 'auto', padding: '0.5rem 0.75rem' }}
-                        value={qty}
-                        onChange={(e) => setAddonQty(a.id, Number(e.target.value))}
-                      >
-                        {Array.from({ length: (a.maxUnits ?? 4) + 1 }).map((_, n) => (
-                          <option key={n} value={n}>{n}</option>
-                        ))}
-                      </select>
-                      {qty > 0 && (
-                        <span style={{ fontWeight: 700, color: 'var(--clay)', whiteSpace: 'nowrap' }}>
-                          {formatPrice(a.priceCents * qty)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
                 );
-              }
 
-              return (
-                <label key={a.id} style={{ ...boxStyle, cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() => toggleAddon(a.id)}
-                    style={{ marginTop: '0.3rem', accentColor: 'var(--clay)' }}
-                  />
-                  {header}
-                </label>
-              );
-            })}
-          </div>
-        </fieldset>
+                const boxStyle: React.CSSProperties = {
+                  display: 'flex',
+                  gap: '1rem',
+                  alignItems: 'flex-start',
+                  borderRadius: '0.85rem',
+                  border: selected ? '2px solid var(--clay)' : '1px solid var(--line)',
+                  backgroundColor: selected ? 'rgba(229,139,130,0.08)' : 'var(--cream)',
+                  padding: '1rem 1.25rem',
+                };
+
+                // Per-unit add-ons get a quantity picker instead of a checkbox —
+                // "$75 / hour" is meaningless without a number of hours.
+                if (a.perUnit) {
+                  return (
+                    <div key={a.id} style={{ ...boxStyle, flexWrap: 'wrap' }}>
+                      {header}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <label className="field-label" htmlFor={`qty-${a.id}`} style={{ margin: 0 }}>
+                          {a.perUnit}s
+                        </label>
+                        <select
+                          id={`qty-${a.id}`}
+                          className="field"
+                          style={{ width: 'auto', padding: '0.5rem 0.75rem' }}
+                          value={qty}
+                          onChange={(e) => setAddonQty(a.id, Number(e.target.value))}
+                        >
+                          {Array.from({ length: (a.maxUnits ?? 4) + 1 }).map((_, n) => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                        </select>
+                        {qty > 0 && (
+                          <span style={{ fontWeight: 700, color: 'var(--clay)', whiteSpace: 'nowrap' }}>
+                            {formatPrice(a.priceCents * qty)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <label key={a.id} style={{ ...boxStyle, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => toggleAddon(a.id)}
+                      style={{ marginTop: '0.3rem', accentColor: 'var(--clay)' }}
+                    />
+                    {header}
+                  </label>
+                );
+              })}
+            </div>
+          </fieldset>
+        )}
 
         {/* 4 — event */}
         <fieldset style={sectionStyle}>
@@ -347,30 +402,53 @@ export default function BookingForm() {
             Your event
           </h2>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
-            <div>
-              <label className="field-label" htmlFor="eventDate">Event date</label>
-              <input id="eventDate" className="field" type="date" min={today()} value={eventDate} onChange={(e) => setEventDate(e.target.value)} required />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label className="field-label">Event date</label>
+              <AvailabilityCalendar boothId={boothId} value={eventDate} onChange={setEventDate} />
               {availability === 'checking' && (
                 <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: '0.5rem 0 0' }}>
                   Checking that date…
                 </p>
               )}
-              {availability === 'free' && (
+              {availability === 'free' && eventDate && (
                 <p style={{ fontSize: '0.8rem', color: '#3c5a2b', fontWeight: 600, margin: '0.5rem 0 0' }}>
-                  ✓ Available
+                  ✓ {eventDate} is available
                 </p>
               )}
               {availability === 'taken' && (
                 <p role="alert" style={{ fontSize: '0.8rem', color: 'var(--danger)', fontWeight: 600, margin: '0.5rem 0 0' }}>
-                  Already booked for this booth. Try another date, or another booth.
+                  That date just got taken for this booth — pick another date, or another booth.
                 </p>
               )}
             </div>
+
             <div>
               <label className="field-label" htmlFor="eventTime">Start time</label>
               <input id="eventTime" className="field" type="time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} required />
+
+              {selectedRate?.durationHours ? (
+                endTime ? (
+                  <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.65)', margin: '0.5rem 0 0' }}>
+                    Ends around {formatTime(endTime.time)}
+                    {endTime.nextDay ? ' (next day)' : ''} — {selectedRate.durationHours} hours of coverage
+                  </p>
+                ) : (
+                  <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: '0.5rem 0 0' }}>
+                    {selectedRate.durationHours} hours of coverage from your start time
+                  </p>
+                )
+              ) : selectedRate?.id === 'completely-captured' ? (
+                <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: '0.5rem 0 0' }}>
+                  1.5 hrs cocktail hour, then 3 hrs at the reception — we will confirm exact timing with your venue
+                </p>
+              ) : (
+                <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: '0.5rem 0 0' }}>
+                  Booth is yours for up to 14 hours from this time
+                </p>
+              )}
             </div>
+
             <div>
               <label className="field-label" htmlFor="eventTitle">Type of event</label>
               <input id="eventTitle" className="field" type="text" placeholder="Wedding, staff party, birthday…" value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
@@ -380,10 +458,24 @@ export default function BookingForm() {
               <input id="guestCount" className="field" type="number" min={1} placeholder="120" value={guestCount} onChange={(e) => setGuestCount(e.target.value)} />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
-              <label className="field-label" htmlFor="venue">Venue and town</label>
-              <input id="venue" className="field" type="text" placeholder="The Barn at Sunset Ridge, Omemee" value={venue} onChange={(e) => setVenue(e.target.value)} />
+              <label className="field-label" htmlFor="venue">Full event address</label>
+              <input
+                id="venue"
+                className="field"
+                type="text"
+                placeholder="123 Main St, Lindsay, ON K9V 1A1"
+                value={venue}
+                onChange={(e) => setVenue(e.target.value)}
+                required
+              />
               <p style={{ fontSize: '0.8rem', color: 'rgba(37,70,65,0.55)', margin: '0.5rem 0 0' }}>
-                Travel is free up to 100&nbsp;km from Omemee. We will let you know if your venue falls outside that.
+                {travelLoading
+                  ? 'Checking the distance…'
+                  : travel?.configured && !travel.needsReview
+                    ? travel.feeCents > 0
+                      ? `${travel.distanceKm ? Math.round(travel.distanceKm) : '?'} km from Omemee — a travel fee applies beyond the free 100 km radius, shown in your total.`
+                      : 'Within the free 100 km travel radius from Omemee ✓'
+                    : 'Free travel up to 100 km from Omemee. We will confirm the exact address and any travel fee with you.'}
               </p>
             </div>
           </div>
@@ -449,6 +541,9 @@ export default function BookingForm() {
                   muted
                 />
               ))}
+              {totals.travelFeeCents > 0 && (
+                <Row label="Travel fee" value={'+ ' + formatPrice(totals.travelFeeCents)} muted />
+              )}
               <Row label="HST" value={formatPrice(totals.hstCents)} muted />
 
               <div style={{ borderTop: '1px solid rgba(250,247,239,0.2)', margin: '1rem 0', paddingTop: '1rem' }}>
@@ -463,10 +558,11 @@ export default function BookingForm() {
                   marginBottom: '1.5rem',
                 }}
               >
-                <Row label="Deposit due today" value={formatPrice(totals.depositCents)} bold accent />
+                <Row label={`${DEPOSIT_PERCENT}% deposit due today`} value={formatPrice(totals.depositCents)} bold accent />
                 <p style={{ color: 'rgba(250,247,239,0.75)', fontSize: '0.82rem', margin: '0.5rem 0 0' }}>
                   Paid securely through Stripe to hold your date. The balance of{' '}
-                  {formatPrice(totals.totalCents - totals.depositCents)} is invoiced closer to the event.
+                  {formatPrice(totals.totalCents - totals.depositCents)} is due{' '}
+                  {dueDate ? `by ${dueDate}` : '7 days before your event'}.
                 </p>
               </div>
             </>

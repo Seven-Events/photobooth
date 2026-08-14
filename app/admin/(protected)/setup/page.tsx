@@ -19,11 +19,13 @@ const LABELS: Record<string, string> = {
   stripeWebhookSecret: 'Stripe — confirming payments',
   resend: 'Email sending',
   siteUrl: 'Site address',
+  googleMaps: 'Travel fee lookup (Google Maps)',
 };
 
 const MIGRATION_LABELS: Record<string, string> = {
   bookingSystem: 'Booking system tables (migration 001)',
   adminBackend: 'Admin backend tables (migration 002)',
+  travelFee: 'Travel fee columns (migration 003)',
 };
 
 export default function SetupPage() {

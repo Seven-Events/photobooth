@@ -52,8 +52,7 @@ export default function PackagesPage() {
           </h1>
           <p style={{ fontSize: '1.15rem' }}>
             Three booths, drop-off or fully staffed. Every option includes a premium backdrop, a live
-            gallery and free travel up to 100&nbsp;km from Omemee. All prices are plus HST — nothing
-            else gets added at the end.
+            gallery and free travel up to 100&nbsp;km from Omemee.
           </p>
         </div>
       </section>

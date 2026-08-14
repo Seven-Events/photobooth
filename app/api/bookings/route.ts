@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendBookingReceivedEmail } from '@/lib/email';
 import { calculateTotals, getBooth, getRate } from '@/lib/packages';
+import { calculateTravelFee } from '@/lib/travel';
 import { createDepositCheckoutSession, isStripeConfigured } from '@/lib/stripe';
 import { NextResponse } from 'next/server';
 
@@ -36,19 +37,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'That event date is in the past.' }, { status: 400 });
     }
 
+    if (!venue || typeof venue !== 'string' || !venue.trim()) {
+      return NextResponse.json({ error: 'Please enter the full event address.' }, { status: 400 });
+    }
+
     if (!getBooth(boothId)) {
       return NextResponse.json({ error: 'Unknown booth.' }, { status: 400 });
     }
 
     const rate = getRate(rateId);
-    if (!rate || rate.boothId !== boothId) {
+    if (!rate || !rate.boothIds.includes(boothId)) {
       return NextResponse.json({ error: 'That package is not available for this booth.' }, { status: 400 });
     }
 
     // Prices are recalculated here from ids. Anything the browser sent about
     // money is ignored — otherwise a customer could set their own deposit.
     const safeAddonIds: string[] = Array.isArray(addonIds) ? addonIds.filter((a) => typeof a === 'string') : [];
-    const totals = calculateTotals(rateId, safeAddonIds);
+
+    // Free within 100km of the shop; $2/km beyond that. Never blocks the
+    // booking if the distance cannot be resolved — it charges no fee and
+    // flags the row for a human to check instead.
+    const travel = await calculateTravelFee(venue);
+
+    const totals = calculateTotals(rateId, safeAddonIds, boothId, travel.feeCents);
     if (!totals) {
       return NextResponse.json({ error: 'We could not price that combination.' }, { status: 400 });
     }
@@ -120,13 +131,16 @@ export async function POST(request: Request) {
         booth_id: boothId,
         rate_id: rateId,
         addon_ids: safeAddonIds,
-        venue: venue || null,
+        venue,
         guest_count: guestCount ?? null,
         subtotal_cents: totals.subtotalCents,
         hst_cents: totals.hstCents,
         total_cents: totals.totalCents,
         deposit_cents: totals.depositCents,
         deposit_status: 'unpaid',
+        travel_fee_cents: travel.feeCents,
+        travel_distance_km: travel.distanceKm,
+        travel_fee_needs_review: travel.needsReview,
         special_requests: specialRequests || null,
         status: isStripeConfigured() ? 'awaiting_deposit' : 'pending',
       })

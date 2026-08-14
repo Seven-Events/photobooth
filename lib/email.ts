@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
-import { formatPrice, getRate } from './packages';
+import { DEPOSIT_PERCENT, formatPrice, getRate } from './packages';
+import { daysBeforeDisplay } from './time';
 
 let client: Resend | null = null;
 
@@ -105,6 +106,7 @@ export async function sendBookingConfirmationEmail(opts: {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://seveneventsphotobooth.com';
   const label = getRate(opts.packageLabel)?.label ?? opts.packageLabel;
+  const dueDate = daysBeforeDisplay(opts.eventDate, 7);
 
   try {
     await resend().emails.send({
@@ -115,15 +117,15 @@ export async function sendBookingConfirmationEmail(opts: {
         'Your date is held',
         `<p style="color: ${INK}; margin: 0 0 20px;">Hi ${opts.name},</p>
          <p style="color: ${INK}; margin: 0 0 20px;">
-           Your deposit came through and your date is locked in. We will be in touch shortly with a
-           questionnaire so we can build your custom print template.
+           Your ${DEPOSIT_PERCENT}% deposit came through and your date is locked in. We will be in touch
+           shortly with a questionnaire so we can build your custom print template.
          </p>
          ${detailBox([
            ['Date', opts.eventDate],
            ['Start time', opts.eventTime],
            ['Package', label],
            ['Deposit paid', formatPrice(opts.depositCents)],
-           ['Balance due before the event', formatPrice(opts.balanceCents)],
+           ['Balance due', `${formatPrice(opts.balanceCents)}${dueDate ? ` by ${dueDate}` : ' — 7 days before your event'}`],
          ])}
          <a href="${siteUrl}/login" style="display: inline-block; background-color: ${CLAY}; color: ${INK}; padding: 14px 28px; text-decoration: none; border-radius: 999px; font-weight: 700;">
            View your booking

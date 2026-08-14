@@ -29,10 +29,11 @@ export interface Event {
   event_title: string;
   /** Which booth. */
   booth_id: BoothId;
-  /** Rate id from lib/packages.ts, e.g. 'mod-completely-captured'. */
+  /** Rate id from lib/packages.ts, e.g. 'completely-captured'. */
   rate_id: string;
   /** Add-on ids from lib/packages.ts. */
   addon_ids: string[];
+  /** Full mailing address — used to calculate the travel fee. */
   venue?: string;
   guest_count?: number;
   /** Cents, captured at booking time so later price changes do not rewrite history. */
@@ -41,6 +42,10 @@ export interface Event {
   total_cents: number;
   deposit_cents: number;
   deposit_status: DepositStatus;
+  travel_fee_cents?: number;
+  travel_distance_km?: number;
+  /** True when the distance could not be calculated automatically and the fee needs a manual check. */
+  travel_fee_needs_review?: boolean;
   stripe_session_id?: string;
   special_requests?: string;
   lumabooth_event_id?: string;

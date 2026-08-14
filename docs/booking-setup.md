@@ -1,19 +1,23 @@
 # Turning on the booking system
 
-Three things must happen before the form can take a deposit. Until then the
-form still works — it saves the booking and emails you, it just skips payment.
+Two things must happen before the form can take a deposit and calculate real
+travel fees. Until then it still works in a reduced way — see each section.
 
-## 1. Run the database migration
+## 1. Run the database migrations
 
-Supabase dashboard → **SQL Editor** → New query → paste the contents of
-`supabase/migrations/001_booking_system.sql` → **Run**.
+Supabase dashboard → **SQL Editor** → New query → paste the contents of each
+file below, in order → **Run**. Safe to run more than once.
 
-It is safe to run more than once. It adds the booking columns, widens the
-status values, and turns on row level security so one customer can never read
-another customer's booking.
+1. `supabase/migrations/001_booking_system.sql` — booking fields, deposit
+   status, row level security
+2. `supabase/migrations/002_admin_backend.sql` — notes, activity log, blocked
+   dates, availability check
+3. `supabase/migrations/003_travel_fee.sql` — travel fee columns
 
-**Until this runs, every booking attempt will fail** — the form posts columns
-that do not exist yet.
+**Until 001 runs, every booking attempt fails outright** — the form posts
+columns that do not exist yet. 002 and 003 add features that degrade
+gracefully if skipped (no double-booking protection, no travel fee) rather
+than breaking bookings entirely, but should still be run.
 
 ## 2. Add the Stripe keys
 
@@ -21,48 +25,79 @@ that do not exist yet.
    - Use the **test** key (`sk_test_…`) first
 2. Vercel → project → **Settings → Environment Variables**, add:
    - `STRIPE_SECRET_KEY`
-3. Stripe dashboard → **Developers → Webhooks** → **Add endpoint**
-   - URL: `https://seveneventsphotobooth.com/api/stripe/webhook`
-   - Event to send: `checkout.session.completed`
-   - Copy the **Signing secret** and add it to Vercel as `STRIPE_WEBHOOK_SECRET`
-4. Redeploy
+3. Redeploy
 
-The webhook matters. The browser redirect after payment is *not* what marks a
-booking paid — a customer can close that tab, and the URL can be faked. Stripe
-calling the webhook is the only thing that sets `deposit_status = 'paid'`.
+Without this, the form still saves bookings and emails you — it just skips
+the payment step and asks the customer to wait for you to confirm and
+arrange the deposit manually.
 
-## 3. Test it end to end
+**The webhook is optional, not required.** The success page verifies payment
+directly with Stripe when the customer returns to the site, which is enough
+to confirm a deposit on its own. Adding a webhook (Stripe → **Developers →
+Webhooks** → endpoint `/api/stripe/webhook`, event
+`checkout.session.completed`, secret as `STRIPE_WEBHOOK_SECRET`) adds cover
+for the rarer case where someone pays and closes the tab before returning.
 
-With test keys in place, book through the form using Stripe's test card:
+## 3. Add a Google Maps API key, for the travel fee
+
+Free within 100 km of the shop; $2/km beyond that, calculated from real
+driving distance via Google's Distance Matrix API.
+
+1. **console.cloud.google.com** → create a project (or use an existing one)
+2. **APIs & Services → Library** → search **Distance Matrix API** → Enable
+3. **APIs & Services → Credentials** → **Create credentials → API key**
+4. Restrict the key to the Distance Matrix API only (Credentials → the key →
+   **API restrictions**) — good practice, not required
+5. Vercel → **Settings → Environment Variables** → add `GOOGLE_MAPS_API_KEY`
+6. Redeploy
+
+Google's low-volume usage is normally covered by their free monthly credit.
+
+**Without this key, no fee is charged and the booking is flagged
+`travel_fee_needs_review`** in the database — visible on the booking's admin
+detail page — rather than blocking the booking or silently undercharging. A
+human can then check the address and invoice any difference by hand.
+
+## 4. Test it end to end
+
+With test Stripe keys in place, book through the form using:
 
 ```
 4242 4242 4242 4242   any future expiry   any CVC   any postcode
 ```
 
+Try an address well outside 100 km of Omemee too, to see the travel fee
+appear in the running total.
+
 Then check:
 
 - The booking appears in **/admin/bookings**
 - Its status reads **Pending** and the deposit reads **paid**
-- The confirmation email arrives
+- The confirmation email arrives, mentioning the deposit percentage and the
+  balance-due date
+- The booking detail page shows the travel fee and distance, if any
 
-When that works, swap the test keys for live ones and repeat once with a real
-card you can refund.
+When that works, swap the test Stripe keys for live ones and repeat once with
+a real card you can refund.
 
 ---
 
-## Things worth deciding
+## Things worth knowing
 
-**The deposit is 25%.** Set in `DEPOSIT_PERCENT` in `lib/packages.ts`. On a
-$1,200 booking that is $339 including HST. Change the number if you would
-rather take a flat amount or a different percentage.
+**The deposit is 35%, balance due 7 days before the event.** Set in
+`DEPOSIT_PERCENT` in `lib/packages.ts`. That wording is generated from the
+constant everywhere it appears — change the number there and every page,
+email and admin screen updates together.
 
-**HST is charged on the deposit.** The deposit is 25% of the HST-inclusive
-total, so tax is collected proportionally up front rather than all at the end.
-Worth confirming with your bookkeeper.
+**HST is charged on the deposit.** The deposit is 35% of the HST-inclusive
+total (rate + add-ons + travel fee), so tax is collected proportionally up
+front rather than all at the end. Worth confirming with your bookkeeper.
 
-**Add-ons are placeholders.** `addons` in `lib/packages.ts` currently lists an
-extra hour, a premium backdrop and a guest book, at prices I chose. Replace
-them with what you actually sell.
+**Rates can belong to more than one booth.** Completely Captured and the
+hourly attendant packages are available on both the Oak and Mod booths —
+`Rate.boothIds` is an array for exactly this. Add-ons can be restricted the
+same way with `Addon.boothIds`; omit it for an add-on available everywhere
+(like Early setup).
 
 ## Where things live
 
@@ -70,12 +105,16 @@ them with what you actually sell.
 | --- | --- |
 | Prices, packages, add-ons, deposit % | `lib/packages.ts` |
 | The booking form | `components/booking/BookingForm.tsx` |
+| Live-availability calendar | `components/booking/AvailabilityCalendar.tsx` |
 | Booking API and price calculation | `app/api/bookings/route.ts` |
+| Travel fee calculation | `lib/travel.ts` |
 | Stripe checkout | `lib/stripe.ts` |
-| Payment confirmation webhook | `app/api/stripe/webhook/route.ts` |
+| Payment confirmation | `lib/confirm-deposit.ts` (called from the success page and the webhook) |
 | Emails | `lib/email.ts` |
 | Admin bookings list | `app/admin/(protected)/bookings/page.tsx` |
+| Setup status at a glance | `/admin/setup` |
 
-`lib/packages.ts` is the single source of truth. The packages page, the booking
-form and the server-side price check all read from it, so changing a price
-there changes it everywhere. Do not hardcode a price anywhere else.
+`lib/packages.ts` is the single source of truth for prices. The packages
+page, the booking form and the server-side price check all read from it, so
+changing a price there changes it everywhere. Do not hardcode a price
+anywhere else.

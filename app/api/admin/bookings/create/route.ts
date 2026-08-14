@@ -1,14 +1,16 @@
 import { requireAdminApi, logActivity } from '@/lib/admin-api';
 import { calculateTotals, getBooth, getRate, HST_PERCENT, DEPOSIT_PERCENT } from '@/lib/packages';
+import { calculateTravelFee } from '@/lib/travel';
 import { NextResponse } from 'next/server';
 
 /**
  * Booking taken by the team — phone, DM, wedding fair.
  *
- * Differs from the public route in two ways: no password is set (the customer
- * can claim the account later via password reset), and the price may be
- * overridden, because deals struck on the phone do not always match the
- * published rate.
+ * Differs from the public route in three ways: no password is set (the
+ * customer can claim the account later via password reset), the price may be
+ * overridden since phone deals do not always match the published rate, and
+ * the travel fee may be typed in directly rather than looked up — useful when
+ * the address lookup is not configured, or the team already knows the fee.
  */
 export async function POST(request: Request) {
   const gate = await requireAdminApi();
@@ -28,7 +30,8 @@ export async function POST(request: Request) {
     venue,
     guestCount,
     specialRequests,
-    overrideSubtotal, // dollars, optional
+    overrideSubtotal, // dollars, optional — replaces rate + add-ons + travel entirely
+    overrideTravelFee, // dollars, optional — replaces just the travel fee
     status = 'pending',
     depositStatus = 'unpaid',
   } = body;
@@ -42,12 +45,34 @@ export async function POST(request: Request) {
   }
 
   const rate = getRate(rateId);
-  if (!rate || rate.boothId !== boothId) {
+  if (!rate || !rate.boothIds.includes(boothId)) {
     return NextResponse.json({ error: 'That package is not available for this booth.' }, { status: 400 });
   }
 
   const safeAddonIds: string[] = Array.isArray(addonIds) ? addonIds.filter((a) => typeof a === 'string') : [];
-  const standard = calculateTotals(rateId, safeAddonIds);
+
+  // Travel fee: an explicit override wins, otherwise look it up from the
+  // address if one was given. Either way this is a known, reviewed figure —
+  // only "nothing given at all" is left flagged for a human to check.
+  let travelFeeCents = 0;
+  let travelDistanceKm: number | null = null;
+  let travelNeedsReview = true;
+
+  if (overrideTravelFee !== undefined && overrideTravelFee !== null && overrideTravelFee !== '') {
+    const cents = Math.round(Number(overrideTravelFee) * 100);
+    if (!Number.isFinite(cents) || cents < 0) {
+      return NextResponse.json({ error: 'Travel fee override must be a positive number.' }, { status: 400 });
+    }
+    travelFeeCents = cents;
+    travelNeedsReview = false;
+  } else if (venue && String(venue).trim()) {
+    const travel = await calculateTravelFee(venue);
+    travelFeeCents = travel.feeCents;
+    travelDistanceKm = travel.distanceKm;
+    travelNeedsReview = travel.needsReview;
+  }
+
+  const standard = calculateTotals(rateId, safeAddonIds, boothId, travelFeeCents);
   if (!standard) {
     return NextResponse.json({ error: 'Could not price that combination.' }, { status: 400 });
   }
@@ -133,6 +158,9 @@ export async function POST(request: Request) {
       total_cents: totals.totalCents,
       deposit_cents: totals.depositCents,
       deposit_status: depositStatus,
+      travel_fee_cents: travelFeeCents,
+      travel_distance_km: travelDistanceKm,
+      travel_fee_needs_review: travelNeedsReview,
       special_requests: specialRequests || null,
       status,
       source: 'manual',
@@ -154,6 +182,7 @@ export async function POST(request: Request) {
     detail: [
       createdCustomer ? 'new customer' : 'existing customer',
       priceOverride ? 'price overridden' : null,
+      travelNeedsReview ? 'travel fee needs review' : null,
     ]
       .filter(Boolean)
       .join(', '),
