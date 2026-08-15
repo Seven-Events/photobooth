@@ -65,7 +65,11 @@ export async function calculateTravelFee(destinationAddress: string): Promise<Tr
     const errorMessage = !Array.isArray(data) ? data?.error?.message : undefined;
 
     if (!res.ok || errorMessage || !element || element.condition !== 'ROUTE_EXISTS' || typeof element.distanceMeters !== 'number') {
-      const reason = errorMessage || element?.status?.message || element?.condition || `HTTP ${res.status}`;
+      const reason =
+        errorMessage ||
+        element?.status?.message ||
+        element?.condition ||
+        (!res.ok ? `HTTP ${res.status}: ${JSON.stringify(data).slice(0, 300)}` : 'unknown error');
       console.error('Routes API could not resolve address:', destinationAddress, reason);
       return { distanceKm: null, feeCents: 0, needsReview: true, reason };
     }
