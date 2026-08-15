@@ -60,11 +60,11 @@ export async function requireAdminApi(): Promise<
  */
 export async function logActivity(
   db: SupabaseClient,
-  opts: { eventId: string; actorId: string; action: string; detail?: string }
+  opts: { eventId: string; actorId?: string | null; action: string; detail?: string }
 ) {
   const { error } = await db.from('event_activity').insert({
     event_id: opts.eventId,
-    actor_id: opts.actorId,
+    actor_id: opts.actorId ?? null,
     action: opts.action,
     detail: opts.detail ?? null,
   });
