@@ -39,8 +39,11 @@ export async function GET() {
   const { error: travelColumnError } = await gate.db.from('events').select('travel_fee_cents').limit(1);
 
   // A present RESEND_API_KEY only proves someone typed something in — it says
-  // nothing about whether the key is valid or a sending domain is verified.
-  // Both those are why "Connected" earlier still meant zero emails going out.
+  // nothing about whether the key is valid, or whether it's even the right
+  // Resend *account*. A key can be perfectly valid and have a verified
+  // domain while still being useless here, if that domain isn't the one we
+  // send from — e.g. a key belonging to an unrelated project's account.
+  const SENDING_DOMAIN = 'seveneventsphotobooth.com';
   let resendStatus: 'unconfigured' | 'invalid_key' | 'no_verified_domain' | 'ready' = 'unconfigured';
   let resendDomains: { name: string; status: string }[] = [];
 
@@ -58,7 +61,9 @@ export async function GET() {
           name: d.name,
           status: d.status,
         }));
-        resendStatus = resendDomains.some((d) => d.status === 'verified') ? 'ready' : 'no_verified_domain';
+        resendStatus = resendDomains.some((d) => d.name === SENDING_DOMAIN && d.status === 'verified')
+          ? 'ready'
+          : 'no_verified_domain';
       } else {
         resendStatus = 'invalid_key';
       }
@@ -90,8 +95,8 @@ export async function GET() {
   } else if (resendStatus === 'no_verified_domain') {
     warnings.push(
       resendDomains.length === 0
-        ? 'Resend has no sending domain added at all — noreply@seveneventsphotobooth.com cannot send until one is added and verified in the Resend dashboard.'
-        : `Resend has a domain added (${resendDomains.map((d) => `${d.name}: ${d.status}`).join(', ')}) but none are verified yet — emails will not send until DNS verification completes.`
+        ? `Resend has no sending domain added at all — noreply@${SENDING_DOMAIN} cannot send until ${SENDING_DOMAIN} is added and verified in the Resend dashboard.`
+        : `${SENDING_DOMAIN} is not a verified domain on this Resend account (it has: ${resendDomains.map((d) => `${d.name} — ${d.status}`).join(', ')}) — this may be the wrong Resend account's API key. Emails will not send until ${SENDING_DOMAIN} itself is added and verified here.`
     );
   }
   if (!checks.siteUrl) {
