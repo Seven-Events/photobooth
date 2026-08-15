@@ -45,15 +45,22 @@ export default function BackdropsPage() {
                 backgroundColor: 'var(--blush)',
                 borderRadius: '0.25rem',
                 marginBottom: '1rem',
+                border: '1px dashed rgba(37,70,65,0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--ink)'
               }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>📸</div>
-                  <p style={{ fontSize: '0.875rem' }}>Backdrop Preview</p>
-                </div>
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(37,70,65,0.45)',
+                    fontWeight: 700,
+                  }}
+                >
+                  Backdrop preview
+                </span>
               </div>
               <h3 style={{ color: 'var(--ink)', marginBottom: '0.5rem' }}>
                 {backdrop.name}

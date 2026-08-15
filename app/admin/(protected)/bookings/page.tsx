@@ -75,7 +75,7 @@ export default function BookingsPage() {
             </p>
           </div>
           <Link href="/admin/bookings/new" className="button-primary" style={{ textDecoration: 'none' }}>
-            ➕ Add booking
+            Add booking
           </Link>
         </div>
 

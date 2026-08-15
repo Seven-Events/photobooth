@@ -57,7 +57,7 @@ export default function TemplatesPage() {
         {/* Info Section */}
         <div style={{ backgroundColor: 'var(--paper)', padding: '2rem', borderRadius: '0.5rem', marginBottom: '2rem', borderLeft: '4px solid var(--clay)' }}>
           <h3 style={{ color: 'var(--ink)', marginBottom: '0.5rem' }}>
-            💡 Customization Tips
+            Customization Tips
           </h3>
           <ul style={{ color: 'var(--ink)', marginLeft: '1.5rem', lineHeight: '1.8' }}>
             <li>Choose a pre-made template below as your starting point</li>
@@ -77,15 +77,22 @@ export default function TemplatesPage() {
                 backgroundColor: 'var(--blush)',
                 borderRadius: '0.25rem',
                 marginBottom: '1rem',
+                border: '1px dashed rgba(37,70,65,0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--ink)'
               }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🎨</div>
-                  <p style={{ fontSize: '0.875rem' }}>Template Design</p>
-                </div>
+                <span
+                  style={{
+                    fontSize: '0.75rem',
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(37,70,65,0.45)',
+                    fontWeight: 700,
+                  }}
+                >
+                  Template preview
+                </span>
               </div>
               <h3 style={{ color: 'var(--ink)', marginBottom: '1rem' }}>
                 {template.name}

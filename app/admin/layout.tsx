@@ -3,12 +3,12 @@ import { requireAdmin } from '@/lib/auth';
 import LogoutButton from '@/components/site/LogoutButton';
 
 const links = [
-  { href: '/admin/dashboard', label: '📊 Dashboard' },
-  { href: '/admin/calendar', label: '🗓️ Calendar' },
-  { href: '/admin/bookings', label: '📅 Bookings' },
-  { href: '/admin/clients', label: '👥 Clients' },
-  { href: '/admin/team', label: '🔑 Team' },
-  { href: '/admin/setup', label: '⚙️ Setup check' },
+  { href: '/admin/dashboard', label: 'Dashboard' },
+  { href: '/admin/calendar', label: 'Calendar' },
+  { href: '/admin/bookings', label: 'Bookings' },
+  { href: '/admin/clients', label: 'Clients' },
+  { href: '/admin/team', label: 'Team' },
+  { href: '/admin/setup', label: 'Setup check' },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

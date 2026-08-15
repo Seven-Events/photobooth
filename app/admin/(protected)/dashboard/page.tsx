@@ -49,19 +49,16 @@ export default function AdminDashboard() {
     {
       label: 'Total Bookings',
       value: analytics.totalBookings,
-      icon: '📅',
       color: 'var(--clay)',
     },
     {
       label: 'Upcoming Events',
       value: analytics.upcomingEvents,
-      icon: '⏰',
       color: 'var(--ok)',
     },
     {
       label: 'Needs Attention',
       value: analytics.awaitingDeposit + analytics.pendingConfirmation,
-      icon: '⚠️',
       color: 'var(--ink)',
     },
     {
@@ -69,7 +66,6 @@ export default function AdminDashboard() {
       // very different numbers and conflating them flatters the figures.
       label: 'Deposits Collected',
       value: formatPrice(analytics.depositsCollectedCents),
-      icon: '💰',
       color: 'var(--clay)',
     },
   ];
@@ -89,12 +85,9 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {statCards.map((card) => (
             <div key={card.label} className="card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                <h3 style={{ color: 'var(--ink)', fontSize: '0.875rem', fontWeight: 600 }}>
-                  {card.label}
-                </h3>
-                <span style={{ fontSize: '1.5rem' }}>{card.icon}</span>
-              </div>
+              <h3 style={{ color: 'var(--ink)', fontSize: '0.875rem', fontWeight: 600, marginBottom: '1rem' }}>
+                {card.label}
+              </h3>
               <p style={{ fontSize: '2rem', color: card.color, fontWeight: 600 }}>
                 {loading ? '...' : card.value}
               </p>
@@ -110,10 +103,10 @@ export default function AdminDashboard() {
             </h3>
             <div className="space-y-3">
               <a href="/admin/bookings" className="button-primary" style={{ display: 'block', textAlign: 'center', padding: '0.75rem', textDecoration: 'none' }}>
-                📅 View All Bookings
+                View All Bookings
               </a>
               <a href="/admin/clients" className="button-secondary" style={{ display: 'block', textAlign: 'center', padding: '0.75rem', textDecoration: 'none' }}>
-                👥 Manage Clients
+                Manage Clients
               </a>
             </div>
           </div>

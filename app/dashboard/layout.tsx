@@ -3,9 +3,9 @@ import { requireAuth } from '@/lib/auth';
 import LogoutButton from '@/components/site/LogoutButton';
 
 const links = [
-  { href: '/dashboard/events', label: '📅 My Bookings' },
-  { href: '/dashboard/backdrops', label: '🎨 Backdrops' },
-  { href: '/dashboard/templates', label: '✏️ Templates' },
+  { href: '/dashboard/events', label: 'My Bookings' },
+  { href: '/dashboard/backdrops', label: 'Backdrops' },
+  { href: '/dashboard/templates', label: 'Templates' },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
