@@ -13,11 +13,16 @@ file below, in order → **Run**. Safe to run more than once.
 2. `supabase/migrations/002_admin_backend.sql` — notes, activity log, blocked
    dates, availability check
 3. `supabase/migrations/003_travel_fee.sql` — travel fee columns
+4. `supabase/migrations/004_drop_package_type_not_null.sql` — drops a leftover
+   NOT NULL constraint on the old bronze/silver/gold `package_type` column.
+   **Required** — without it every booking fails with a database error,
+   since nothing writes to that column anymore.
 
-**Until 001 runs, every booking attempt fails outright** — the form posts
-columns that do not exist yet. 002 and 003 add features that degrade
-gracefully if skipped (no double-booking protection, no travel fee) rather
-than breaking bookings entirely, but should still be run.
+**Until 001 and 004 run, every booking attempt fails outright** — 001
+because the form posts columns that do not exist yet, 004 because of the
+leftover constraint above. 002 and 003 add features that degrade gracefully
+if skipped (no double-booking protection, no travel fee) rather than
+breaking bookings entirely, but should still be run.
 
 ## 2. Add the Stripe keys
 
