@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 type Health = {
   checks: Record<string, boolean>;
+  resendDomains: { name: string; status: string }[];
   stripeMode: 'live' | 'test' | null;
   migrations: Record<string, boolean>;
   warnings: string[];
@@ -122,6 +123,20 @@ export default function SetupPage() {
                   <Row key={k} label={LABELS[k] ?? k} ok={ok} />
                 ))}
               </div>
+
+              {health.resendDomains.length > 0 && (
+                <div style={{ marginTop: '1.25rem', display: 'grid', gap: '0.4rem' }}>
+                  <p style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(37,70,65,0.5)', fontWeight: 700, margin: 0 }}>
+                    Resend sending domains
+                  </p>
+                  {health.resendDomains.map((d) => (
+                    <div key={d.name} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: 'var(--ink)' }}>
+                      <span>{d.name}</span>
+                      <span style={{ fontWeight: 700, color: d.status === 'verified' ? '#3c5a2b' : '#8a3b32' }}>{d.status}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {health.stripeMode && (
                 <p

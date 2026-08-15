@@ -38,6 +38,40 @@ export async function GET() {
   const { error: notesTableError } = await gate.db.from('booking_notes').select('id').limit(1);
   const { error: travelColumnError } = await gate.db.from('events').select('travel_fee_cents').limit(1);
 
+  // A present RESEND_API_KEY only proves someone typed something in — it says
+  // nothing about whether the key is valid or a sending domain is verified.
+  // Both those are why "Connected" earlier still meant zero emails going out.
+  let resendStatus: 'unconfigured' | 'invalid_key' | 'no_verified_domain' | 'ready' = 'unconfigured';
+  let resendDomains: { name: string; status: string }[] = [];
+
+  if (checks.resend) {
+    try {
+      const res = await fetch('https://api.resend.com/domains', {
+        headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}` },
+      });
+
+      if (res.status === 401 || res.status === 403) {
+        resendStatus = 'invalid_key';
+      } else if (res.ok) {
+        const data = await res.json();
+        resendDomains = (data?.data ?? []).map((d: { name: string; status: string }) => ({
+          name: d.name,
+          status: d.status,
+        }));
+        resendStatus = resendDomains.some((d) => d.status === 'verified') ? 'ready' : 'no_verified_domain';
+      } else {
+        resendStatus = 'invalid_key';
+      }
+    } catch (err) {
+      console.error('Could not reach Resend:', err);
+      resendStatus = 'invalid_key';
+    }
+  }
+
+  // The setup page's "Email sending" row should reflect whether email can
+  // actually go out, not just whether a key was pasted in somewhere.
+  checks.resend = resendStatus === 'ready';
+
   const warnings: string[] = [];
   const suggestions: string[] = [];
 
@@ -51,6 +85,14 @@ export async function GET() {
   }
   if (!checks.resend) {
     warnings.push('RESEND_API_KEY is missing — no booking emails will be sent.');
+  } else if (resendStatus === 'invalid_key') {
+    warnings.push('RESEND_API_KEY is set but Resend rejected it — check the key is correct and has not been revoked. No booking emails are sending.');
+  } else if (resendStatus === 'no_verified_domain') {
+    warnings.push(
+      resendDomains.length === 0
+        ? 'Resend has no sending domain added at all — noreply@seveneventsphotobooth.com cannot send until one is added and verified in the Resend dashboard.'
+        : `Resend has a domain added (${resendDomains.map((d) => `${d.name}: ${d.status}`).join(', ')}) but none are verified yet — emails will not send until DNS verification completes.`
+    );
   }
   if (!checks.siteUrl) {
     warnings.push('NEXT_PUBLIC_SITE_URL is missing — Stripe return links and email links may point at the wrong place.');
@@ -74,6 +116,7 @@ export async function GET() {
 
   return NextResponse.json({
     checks,
+    resendDomains,
     stripeMode,
     migrations: {
       bookingSystem: !availabilityFnError,
