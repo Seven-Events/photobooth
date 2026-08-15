@@ -93,10 +93,18 @@ export async function GET() {
   } else if (resendStatus === 'invalid_key') {
     warnings.push('RESEND_API_KEY is set but Resend rejected it — check the key is correct and has not been revoked. No booking emails are sending.');
   } else if (resendStatus === 'no_verified_domain') {
+    // Known, expected right now: the domain is mid-transfer between
+    // registrars and its DNS cannot be edited until that finishes, so
+    // verifying it in Resend is blocked until then, not actually broken.
+    const domainTransferNote =
+      new Date() < new Date('2026-08-19')
+        ? ` ${SENDING_DOMAIN} is mid-transfer between registrars and its DNS is locked until that completes (expected 2026-08-19) — this is expected until then, not something to fix right now.`
+        : '';
     warnings.push(
-      resendDomains.length === 0
+      (resendDomains.length === 0
         ? `Resend has no sending domain added at all — noreply@${SENDING_DOMAIN} cannot send until ${SENDING_DOMAIN} is added and verified in the Resend dashboard.`
-        : `${SENDING_DOMAIN} is not a verified domain on this Resend account (it has: ${resendDomains.map((d) => `${d.name} — ${d.status}`).join(', ')}) — this may be the wrong Resend account's API key. Emails will not send until ${SENDING_DOMAIN} itself is added and verified here.`
+        : `${SENDING_DOMAIN} is not a verified domain on this Resend account (it has: ${resendDomains.map((d) => `${d.name} — ${d.status}`).join(', ')}) — this may be the wrong Resend account's API key. Emails will not send until ${SENDING_DOMAIN} itself is added and verified here.`) +
+        domainTransferNote
     );
   }
   if (!checks.siteUrl) {
