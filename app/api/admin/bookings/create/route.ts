@@ -172,7 +172,12 @@ export async function POST(request: Request) {
 
   if (eventError || !event) {
     console.error('Could not create manual booking:', eventError);
-    return NextResponse.json({ error: 'Could not save the booking.' }, { status: 500 });
+    // Admin-only screen, so the real Postgres error is safe to show directly
+    // rather than sending you to check server logs for it.
+    return NextResponse.json(
+      { error: 'Could not save the booking.', detail: eventError?.message },
+      { status: 500 }
+    );
   }
 
   await logActivity(gate.db, {

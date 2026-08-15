@@ -85,7 +85,7 @@ export default function NewBookingPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Could not save the booking.');
+        setError([data.error || 'Could not save the booking.', data.detail].filter(Boolean).join(' — '));
         setSaving(false);
         return;
       }

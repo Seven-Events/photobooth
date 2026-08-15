@@ -199,7 +199,7 @@ export default function BookingForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Something went wrong. Please try again.');
+        setError([data.error || 'Something went wrong. Please try again.', data.detail].filter(Boolean).join(' — '));
         setSubmitting(false);
         return;
       }

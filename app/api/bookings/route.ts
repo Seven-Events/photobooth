@@ -148,8 +148,14 @@ export async function POST(request: Request) {
       .single();
 
     if (eventError || !eventData) {
+      console.error('Could not save booking:', eventError);
       await adminClient.auth.admin.deleteUser(userId);
-      return NextResponse.json({ error: 'Could not save your booking.' }, { status: 500 });
+      // Not yet live to real customers, so surface the real reason rather than
+      // a dead end — remove `detail` once this is confirmed working.
+      return NextResponse.json(
+        { error: 'Could not save your booking.', detail: eventError?.message },
+        { status: 500 }
+      );
     }
 
     // 4. Payment, if Stripe is set up
