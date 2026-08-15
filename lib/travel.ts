@@ -26,6 +26,10 @@ export type TravelFeeResult = {
   /** True when the distance could not be determined — the fee is $0 and a
    *  human needs to check the address and invoice any difference by hand. */
   needsReview: boolean;
+  /** Google's own status string when the lookup failed, e.g. "REQUEST_DENIED"
+   *  — not shown to customers, just enough to diagnose a misconfigured key
+   *  without needing to dig through server logs. */
+  reason?: string;
 };
 
 export async function calculateTravelFee(destinationAddress: string): Promise<TravelFeeResult> {
@@ -45,13 +49,15 @@ export async function calculateTravelFee(destinationAddress: string): Promise<Tr
     const element = data?.rows?.[0]?.elements?.[0];
 
     if (data.status !== 'OK' || !element || element.status !== 'OK') {
+      const reason = data.error_message || element?.status || data.status || 'unknown error';
       console.error(
         'Distance Matrix could not resolve address:',
         destinationAddress,
         data.status,
-        element?.status
+        element?.status,
+        data.error_message
       );
-      return { distanceKm: null, feeCents: 0, needsReview: true };
+      return { distanceKm: null, feeCents: 0, needsReview: true, reason };
     }
 
     const distanceKm = element.distance.value / 1000;
@@ -61,6 +67,6 @@ export async function calculateTravelFee(destinationAddress: string): Promise<Tr
     return { distanceKm, feeCents, needsReview: false };
   } catch (err) {
     console.error('Distance Matrix request failed:', err);
-    return { distanceKm: null, feeCents: 0, needsReview: true };
+    return { distanceKm: null, feeCents: 0, needsReview: true, reason: 'request failed' };
   }
 }
