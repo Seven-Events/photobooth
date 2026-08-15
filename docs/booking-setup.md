@@ -41,13 +41,18 @@ for the rarer case where someone pays and closes the tab before returning.
 ## 3. Add a Google Maps API key, for the travel fee
 
 Free within 100 km of the shop; $2/km beyond that, calculated from real
-driving distance via Google's Distance Matrix API.
+driving distance via Google's Routes API. (Not the older Distance Matrix
+API — Google treats that as legacy and does not enable it for new Cloud
+projects, so it fails with "legacy API... not enabled" even with a valid
+key. Routes API is the current replacement.)
 
 1. **console.cloud.google.com** → create a project (or use an existing one)
-2. **APIs & Services → Library** → search **Distance Matrix API** → Enable
+2. **APIs & Services → Library** → search **Routes API** → Enable
 3. **APIs & Services → Credentials** → **Create credentials → API key**
-4. Restrict the key to the Distance Matrix API only (Credentials → the key →
-   **API restrictions**) — good practice, not required
+4. Restrict the key to the Routes API only (Credentials → the key →
+   **API restrictions**) — good practice, not required. Do not add an HTTP
+   referrer restriction — this call happens server-side with no referrer, so
+   a referrer restriction blocks every request.
 5. Vercel → **Settings → Environment Variables** → add `GOOGLE_MAPS_API_KEY`
 6. Redeploy
 

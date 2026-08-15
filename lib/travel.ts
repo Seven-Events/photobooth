@@ -2,9 +2,12 @@
  * Distance-based travel fee.
  *
  * Free within 100 km driving distance of the shop. Beyond that, $2/km on the
- * distance over 100 km. Uses Google's Distance Matrix API for real driving
- * distance rather than straight-line distance, which would under-charge on
- * anywhere the road route is meaningfully longer than "as the crow flies".
+ * distance over 100 km. Uses Google's Routes API (computeRouteMatrix) for
+ * real driving distance rather than straight-line distance, which would
+ * under-charge on anywhere the road route is meaningfully longer than "as
+ * the crow flies". The older Distance Matrix API is not an option here —
+ * Google now treats it as legacy and does not enable it for new Cloud
+ * projects, actively pointing callers at Routes API instead.
  *
  * Optional at runtime, the same way Stripe is: without GOOGLE_MAPS_API_KEY set,
  * no fee is charged and the booking is flagged for a human to check the
@@ -38,35 +41,42 @@ export async function calculateTravelFee(destinationAddress: string): Promise<Tr
   }
 
   try {
-    const url = new URL('https://maps.googleapis.com/maps/api/distancematrix/json');
-    url.searchParams.set('origins', ORIGIN_ADDRESS);
-    url.searchParams.set('destinations', destinationAddress);
-    url.searchParams.set('units', 'metric');
-    url.searchParams.set('key', process.env.GOOGLE_MAPS_API_KEY!);
+    const res = await fetch('https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': process.env.GOOGLE_MAPS_API_KEY!,
+        // Only ask for what we use — Routes API bills/limits by field mask size.
+        'X-Goog-FieldMask': 'originIndex,destinationIndex,status,condition,distanceMeters',
+      },
+      body: JSON.stringify({
+        origins: [{ waypoint: { address: ORIGIN_ADDRESS } }],
+        destinations: [{ waypoint: { address: destinationAddress } }],
+        travelMode: 'DRIVE',
+        routingPreference: 'TRAFFIC_UNAWARE',
+      }),
+    });
 
-    const res = await fetch(url.toString());
     const data = await res.json();
-    const element = data?.rows?.[0]?.elements?.[0];
 
-    if (data.status !== 'OK' || !element || element.status !== 'OK') {
-      const reason = data.error_message || element?.status || data.status || 'unknown error';
-      console.error(
-        'Distance Matrix could not resolve address:',
-        destinationAddress,
-        data.status,
-        element?.status,
-        data.error_message
-      );
+    // A single origin/destination pair still comes back as an array with one
+    // element (or zero, if the address could not be routed at all).
+    const element = Array.isArray(data) ? data[0] : undefined;
+    const errorMessage = !Array.isArray(data) ? data?.error?.message : undefined;
+
+    if (!res.ok || errorMessage || !element || element.condition !== 'ROUTE_EXISTS' || typeof element.distanceMeters !== 'number') {
+      const reason = errorMessage || element?.status?.message || element?.condition || `HTTP ${res.status}`;
+      console.error('Routes API could not resolve address:', destinationAddress, reason);
       return { distanceKm: null, feeCents: 0, needsReview: true, reason };
     }
 
-    const distanceKm = element.distance.value / 1000;
+    const distanceKm = element.distanceMeters / 1000;
     const billableKm = Math.max(0, distanceKm - FREE_RADIUS_KM);
     const feeCents = Math.round(billableKm * RATE_PER_KM_CENTS);
 
     return { distanceKm, feeCents, needsReview: false };
   } catch (err) {
-    console.error('Distance Matrix request failed:', err);
+    console.error('Routes API request failed:', err);
     return { distanceKm: null, feeCents: 0, needsReview: true, reason: 'request failed' };
   }
 }
